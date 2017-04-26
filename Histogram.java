@@ -55,40 +55,41 @@ public class Histogram {
     public Boolean histogramSimilarity(Hashtable<Integer, Integer> waldo, Hashtable<Integer, Integer> compare){
 	Set<Integer> waldoKeys = waldo.keySet();
 
-	int topSum = 0;
-	int botSum = 0;
+	float topSum = 0;
+	float botSum = 0;
 	for(Integer integer: waldoKeys){
 	    Integer waldoVal = waldo.get(integer);
 	    Integer compVal = compare.get(integer);
 	    if(compVal != null){
 		topSum += Math.min(waldoVal.intValue(), compVal.intValue());
 		botSum += compVal.intValue();
+		
 	    }
 	}
 	
 	return topSum/botSum > 0.6;
-
+	
     }
 
     public Boolean histogramSimilarity2(Hashtable<Integer, Integer> waldo, Hashtable<Integer, Integer> compare){
 	Set<Integer> waldoKeys = waldo.keySet();
 
-	int sum = 0;
+	float sum = 0;
 	for(Integer integer: waldoKeys){
-	    int top = 0;
-	    int bot = 0;
+	    float top = 0;
+	    float bot = 0;
 	    Integer waldoVal = waldo.get(integer);
 	    Integer compVal = compare.get(integer);
-	    if(compVal != null){
+	    if(compVal != null || (waldoVal == 0 && compVal == 0)){
 		top = waldoVal.intValue() - compVal.intValue();
 		top *= top;
-		bot = waldoVal.intValue() + compVal.intValue();
+		bot = waldoVal.intValue() + compVal.intValue();	
 	    }
-	    sum += top/bot;
+	    if(bot != 0) sum += top/bot;
 	}
 	
 	sum *= 2;
-	
+	System.out.println(sum);
 	return sum > 500;
     }
 
@@ -103,7 +104,7 @@ public class Histogram {
 	    for( int x = 0; x < image.getWidth(); x++){
 		for( int y = 0; y < image.getHeight(); y++){
 		    Integer color = image.getRGB(x,y);
-		    color = editColor(color);	    
+		    //color = editColor(color);	    
 		    
 		    Integer numOccurences = histogram.get(color);
 
@@ -119,9 +120,9 @@ public class Histogram {
 	    
 	    Hashtable<Integer, Integer> histogram2 = new Hashtable<Integer, Integer>();
 
-	    for( int x = 0; x < image.getWidth(); x++){
-		for( int y = 0; y < image.getHeight(); y++){
-		    Integer color = image.getRGB(x,y);
+	    for( int x = 0; x < otherImage.getWidth(); x++){
+		for( int y = 0; y < otherImage.getHeight(); y++){
+		    Integer color = otherImage.getRGB(x,y);
 		    color = editColor(color);	    
 		    
 		    Integer numOccurences = histogram2.get(color);
@@ -134,8 +135,8 @@ public class Histogram {
 		}
 	    }
 	    
-	    System.out.println(histogramSimilarity2(histogram, histogram2));
 	    System.out.println(histogramSimilarity(histogram, histogram2));
+	    System.out.println(histogramSimilarity2(histogram, histogram2));
 
 	}
 	catch (IOException e){
@@ -144,7 +145,7 @@ public class Histogram {
     }
 
     public static void main(String[] argv){
-	System.out.println(argv[0]);
+	
 	new Histogram(argv);
     }
 
