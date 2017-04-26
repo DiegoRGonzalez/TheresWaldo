@@ -12,8 +12,8 @@ public class TheresWaldo {
 	this.image = image;
     }
 
-    public Vector<BufferedImage> createSubimages(int width, int height) {
-	Vector<BufferedImage> subimages = new Vector<BufferedImage>();
+    public Vector<Subimage> createSubimages(int width, int height) {
+	Vector<Subimage> subimages = new Vector<Subimage>();
 	int totalHeight = image.getHeight();
 	int totalWidth = image.getWidth();
 	int widthNum = (2 * (totalWidth / width)) - 1;
@@ -23,8 +23,10 @@ public class TheresWaldo {
 	
 	for(int i = 0; i < widthNum; i++){
 	    for(int j = 0; j < heightNum; j++){
-		BufferedImage subimage = image.getSubimage(i * widthStep, j * heightStep, width, height);
-		subimages.add(subimage);
+		int x = i * widthStep;
+		int y = j * heightStep;
+		BufferedImage subimage = image.getSubimage(x, y, width, height);
+		subimages.add(new Subimage(subimage, x, y));
 	    }
 	}
 
@@ -32,28 +34,34 @@ public class TheresWaldo {
 	int extraHeight = (int)((float) totalHeight % (float) height);
 	
 	if(extraWidth != 0){
+	    int x = totalWidth - (2 * extraWidth);
 	    for(int i = 0; i < heightNum; i++){
-		BufferedImage subimage = image.getSubimage(totalWidth - (2 * extraWidth), i * heightStep, extraWidth * 2, height);
-		subimages.add(subimage);
+		int y = i * heightStep;
+		BufferedImage subimage = image.getSubimage(x, y, extraWidth * 2, height);
+		subimages.add(new Subimage(subimage, x, y));
 	    }   
 	}
 
 	if(extraHeight != 0){
+	    int y = totalHeight - (2 * extraHeight);
 	    for(int i = 0; i < widthNum; i++){
-		BufferedImage subimage = image.getSubimage(i * widthStep, totalHeight - (2 * extraHeight), width, 2 * extraHeight);
-		subimages.add(subimage);
+		int x = i * widthStep;
+		BufferedImage subimage = image.getSubimage(x, y, width, 2 * extraHeight);
+		subimages.add(new Subimage(subimage, x, y));
 	    }
 	}
 
 	if(extraWidth != 0 && extraHeight != 0){
-	    BufferedImage subimage = image.getSubimage(totalWidth - (2 * extraWidth), totalHeight - (2 * extraHeight), 2 * extraWidth, 2 * extraHeight);
-	    subimages.add(subimage);
+	    int x = totalWidth - (2 * extraWidth);
+	    int y = totalHeight - (2 * extraHeight);
+	    BufferedImage subimage = image.getSubimage(x, y, 2 * extraWidth, 2 * extraHeight);
+	    subimages.add(new Subimage(subimage, x, y));
 	}
 
 	for(int i = 0; i < subimages.size(); i++){
 	    try{
 		File outputfile = new File("subimage"+i+".jpg");
-		ImageIO.write(subimages.get(i), "jpg", outputfile);
+		ImageIO.write(subimages.get(i).getImage(), "jpg", outputfile);
 	    } catch(IOException e) {
 		System.out.println("There was a problem");
 	    }	
