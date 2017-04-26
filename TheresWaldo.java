@@ -2,39 +2,39 @@ import java.io.File;
 import java.io.IOException;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
-
+import java.util.Vector;
 
 public class TheresWaldo {
+    
+    private BufferedImage image;
 
+    public TheresWaldo(BufferedImage image) {
+	this.image = image;
+    }
 
-    public TheresWaldo(String path) {
-	try {
-	    BufferedImage image= ImageIO.read(new File(path));
-	    
-	    for( int i = 0; i < image.getWidth(); i++){
-		for( int j = 0; j < image.getHeight(); j++){
-		    image.getRGB(i, j);
-		}
+    public Vector<BufferedImage> createSubimages(int width, int height) {
+	Vector<BufferedImage> subimages = new Vector<BufferedImage>();
+	int widthNum = (2 * (image.getWidth() / width)) - 1;
+	int heightNum = (2 * (image.getHeight() / height)) - 1;
+	int widthStep = width / 2;
+	int heightStep = height / 2;
+	
+	for(int i = 0; i < widthNum; i++){
+	    for(int j = 0; j < heightNum; j++){
+		BufferedImage subimage = image.getSubimage(i * widthStep, j * heightStep, width, height);
+		subimages.add(subimage);
 	    }
-	    System.out.println("Waldo is somewhere in there");
-	    
-
-	}
-	catch (IOException e){
-	    System.out.println("Waldo is not in there");
 	}
 
+	for(int i = 0; i < subimages.size(); i++){
+	    try{
+		File outputfile = new File("subimage"+i+".jpg");
+		ImageIO.write(subimages.get(i), "jpg", outputfile);
+	    } catch(IOException e) {
+		System.out.println("There was a problem");
+	    }	
+	}
+
+	return subimages;
     }
-
-
-    public static void main(String[] argv){
-	System.out.println(argv[0]);
-	new TheresWaldo(argv[0]);
-    }
-
-
-
-
-
-
 }
