@@ -14,7 +14,7 @@ public class Main {
 	    try {
 		BufferedImage image= ImageIO.read(new File(path));
 		TheresWaldo theresWaldo = new TheresWaldo(image);
-		theresWaldo.createSubimages(100, 100);
+		theresWaldo.createSubimages(38,38);
 	    } catch(IOException e){
 		System.out.println("Not a valid image file!");
 		continue;
