@@ -1,8 +1,16 @@
+//(c) 2017 John Freeman, Diego Gonzalez, Jose Rivas
 import java.awt.image.BufferedImage;
 
+//Simple class to save a buffered image and x and y value that corresponds to
+//a small portion of the original image
 public class Subimage {
 
+    //Global variables
     private BufferedImage image;
+    
+    //x and y correspond to the coordinate of top left corner of the subimage
+    //in the original image. We can get the rest of the pixels this subimage
+    //covers in the original image from the height and width of image.
     private int x;
     private int y;
 
@@ -11,7 +19,7 @@ public class Subimage {
 	this.x = x;
 	this.y = y;
     }
-
+    
     public BufferedImage getImage() {
 	return image;
     }

@@ -1,26 +1,40 @@
+//(c) John Freeman, Diego Gonzalez, Jose Rivas
 import java.io.File;
 import java.io.IOException;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.util.Vector;
 
+//Currently, a class that does the creation and writing of subimages of the original image
 public class TheresWaldo {
     
+    //Global variables
     private BufferedImage image;
 
+    //Constructor
     public TheresWaldo(BufferedImage image) {
 	this.image = image;
     }
 
+    //Generates a Vector of Subimages of the original image where each subimage is of
+    //the dimensions given and does a 50% overlap to avoid cutting something off
     public Vector<Subimage> createSubimages(int width, int height) {
 	Vector<Subimage> subimages = new Vector<Subimage>();
+	
+	//Save the dimensions of the original image
 	int totalHeight = image.getHeight();
 	int totalWidth = image.getWidth();
+	
+	//Calculate the number of cus you must make on a given side of the image
 	int widthNum = (2 * (totalWidth / width)) - 1;
 	int heightNum = (2 * (totalHeight / height)) - 1;
+	
+	//Calculate how far each step must be down a side to perform a slice with
+	//50% overlap
 	int widthStep = width / 2;
 	int heightStep = height / 2;
 	
+	//Go down both sides of the image and create subimages and put them in the Vector
 	for(int i = 0; i < widthNum; i++){
 	    for(int j = 0; j < heightNum; j++){
 		int x = i * widthStep;
@@ -30,9 +44,13 @@ public class TheresWaldo {
 	    }
 	}
 
+	//Check if there is extra image on the sides of the image that were not
+	//included in the subimages
 	int extraWidth = (int)((float) totalWidth % (float) width);
 	int extraHeight = (int)((float) totalHeight % (float) height);
 	
+	//If there is extra space on the width of the image not included in any subimage,
+	//create subimages to include it and add it to the Vector
 	if(extraWidth != 0){
 	    int x = totalWidth - (2 * extraWidth);
 	    for(int i = 0; i < heightNum; i++){
@@ -42,6 +60,8 @@ public class TheresWaldo {
 	    }   
 	}
 
+	//If there is extra space on the height of the image not included in any subimage,
+	//create subimages to include it and add it to the Vector
 	if(extraHeight != 0){
 	    int y = totalHeight - (2 * extraHeight);
 	    for(int i = 0; i < widthNum; i++){
@@ -51,6 +71,8 @@ public class TheresWaldo {
 	    }
 	}
 
+	//If there is extra space on the width and the height of the image not included in any subimage,
+	//create a subimage to include thast corner and add it to the Vector
 	if(extraWidth != 0 && extraHeight != 0){
 	    int x = totalWidth - (2 * extraWidth);
 	    int y = totalHeight - (2 * extraHeight);
@@ -59,8 +81,9 @@ public class TheresWaldo {
 	}
     
 	return subimages;
-}
+    }
 
+    //Write a Vector of subimages to the home directory
     public void writeSubimages(Vector<Subimage> subimages) {
 	for(int i = 0; i < subimages.size(); i++){
 	    try{
