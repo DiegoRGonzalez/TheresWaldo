@@ -15,6 +15,7 @@ public class EdgeDetector {
 
     public EdgeDetector() { }
     
+    // copies a bufferedImage with no connection to the original 
     static BufferedImage deepCopy(BufferedImage bi) {
 	
 	ColorModel cm = bi.getColorModel();
@@ -24,6 +25,7 @@ public class EdgeDetector {
 	
     }
     
+    //Returns an int array with the width and height of a subimage size
     public int[] getSpliceSize(BufferedImage image){
 	ArrayList widthList = new ArrayList();
 	ArrayList heightList= new ArrayList();
@@ -36,10 +38,10 @@ public class EdgeDetector {
 
 
 	
-	// To be used to find largest edge width
+	//Edges will be measured and stored here
 	int currentHeight= 0;
 
-	
+	//Loop over the pixels and measure vertical edges
 	for( int i = 0; i < image.getWidth(); i++){
 	    for( int j = 0; j < image.getHeight(); j++){
 		if(i != 0 && i != image.getWidth()-1){
@@ -51,6 +53,8 @@ public class EdgeDetector {
 		    borderSum2 = border2.getRed() + border2.getBlue() + border2.getGreen();
 							   
 		
+		    //Check to see if the pixel values between current pixel and adjacent pixels
+		    //are different enough to indicate an edge
 		    if(Math.abs(borderSum1 - currentSum) > threshold || Math.abs(borderSum2 - currentSum) > threshold){
 			currentHeight += 1;
 		
@@ -68,9 +72,11 @@ public class EdgeDetector {
 	    }
 	}
 
-	// To be used to find largest edge width
+	//Edges will be measured and stored here
 	int currentWidth = 0;
-	int sum = 0;
+
+	
+	//Loop over the pixels and measure horizontal edges
 	for( int j = 0; j < image.getHeight(); j++){
 	    for( int i = 0; i < image.getWidth(); i++){
 	    
@@ -81,13 +87,14 @@ public class EdgeDetector {
 		    currentSum = mycolor.getRed() + mycolor.getBlue() + mycolor.getGreen();
 		    borderSum1 = border1.getRed() + border1.getBlue() + border1.getGreen();
 		    borderSum2 = border2.getRed() + border2.getBlue() + border2.getGreen();
-							   
-		
+					
+		   
+		    //Check to see if the pixel values between current pixel and adjacent pixels
+		    //are different enough to indicate an edge
 		    if(Math.abs(borderSum1 - currentSum) > threshold || Math.abs(borderSum2 - currentSum) > threshold){
 			currentWidth += 1;
 		    }else if (currentWidth > 5){
 			widthList.add(currentWidth);
-			sum += currentWidth;
 			currentWidth = 0;
 		    }else{
 			currentWidth = 0;
@@ -98,9 +105,12 @@ public class EdgeDetector {
 	}
 	
        
+	//Sort our ArrayLists of edges
 	Collections.sort(widthList);
 	Collections.sort(heightList);
 
+
+	//Test code
 	/*Iterator it = widthList.iterator();
 	while(it.hasNext()){
 	    System.out.println(it.next());
@@ -112,10 +122,18 @@ public class EdgeDetector {
 	    System.out.println("Nope");
 	}*/
 
+
+	//In order to avoid outliers, we will get the 99th percentile size of edges and
+	//use this as our rough estimate as to the size of a person.
 	Float percentage = 99.0f/100.0f;
 	int width = (int)widthList.get((int)Math.floor(percentage*widthList.size()));
 	int height = (int)heightList.get((int)Math.floor(percentage*heightList.size()));
-	return new int[]{2*width,2*height};
+	
+	//This is to ensure a square subimage size
+	int size = Math.max(height,width);
+
+	//Double the size of the person to make sure we get people inside our subimages
+	return new int[]{2*size,2*size};
 
 
     }
