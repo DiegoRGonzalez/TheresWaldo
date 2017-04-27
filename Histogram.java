@@ -42,103 +42,53 @@ public class Histogram {
 	}
     }
     */
-
-    private Integer editColor(Integer color){
-	int r = (color >> 16) & 0xff;
-	int g = (color >> 8) & 0xff;
-	int b = (color & 0xff);
-	
-	return new Integer(256 * r/16 + 16 * g/16 + b/16);
-	    
-    }
     
-    public Boolean histogramSimilarity(Hashtable<Integer, Integer> waldo, Hashtable<Integer, Integer> compare){
-	Set<Integer> waldoKeys = waldo.keySet();
-
-	float topSum = 0;
-	float botSum = 0;
-	for(Integer integer: waldoKeys){
-	    Integer waldoVal = waldo.get(integer);
-	    Integer compVal = compare.get(integer);
-	    if(compVal != null){
-		topSum += Math.min(waldoVal.intValue(), compVal.intValue());
-		botSum += compVal.intValue();
-		
-	    }
-	}
-	
-	return topSum/botSum > 0.6;
-	
-    }
-
-    public Boolean histogramSimilarity2(Hashtable<Integer, Integer> waldo, Hashtable<Integer, Integer> compare){
-	Set<Integer> waldoKeys = waldo.keySet();
-
-	float sum = 0;
-	for(Integer integer: waldoKeys){
-	    float top = 0;
-	    float bot = 0;
-	    Integer waldoVal = waldo.get(integer);
-	    Integer compVal = compare.get(integer);
-	    if(compVal != null || (waldoVal == 0 && compVal == 0)){
-		top = waldoVal.intValue() - compVal.intValue();
-		top *= top;
-		bot = waldoVal.intValue() + compVal.intValue();	
-	    }
-	    if(bot != 0) sum += top/bot;
-	}
-	
-	sum *= 2;
-	System.out.println(sum);
-	return sum > 500;
-    }
-
     public Histogram(String[] imagePath) {
 	try {
-	    BufferedImage image = ImageIO.read(new File(imagePath[0]));
+	    BufferedImage waldoImage = ImageIO.read(new File(imagePath[0]));
 	    
-	    Hashtable<Integer, Integer> histogram = new Hashtable<Integer, Integer>();
-	    Set<Integer> colorSet = new HashSet<Integer>();
-	    int numColors = 0;
-	    
-	    for( int x = 0; x < image.getWidth(); x++){
-		for( int y = 0; y < image.getHeight(); y++){
-		    Integer color = image.getRGB(x,y);
-		    //color = editColor(color);	    
-		    
-		    Integer numOccurences = histogram.get(color);
+	    Hashtable<Integer, Integer> waldoHist = new Hashtable<Integer, Integer>();
 
-		    if (numOccurences == null){
-			histogram.put(color, 1);
-		    } else{
-			histogram.put(color, numOccurences + 1);
-		    } 
+	    int waldoPixels = waldoImage.getWidth() * waldoImage.getHeight();
+
+	    int countRed = 0;
+	    int countWhite = 0;
+	    for( int x = 0; x < waldoImage.getWidth(); x++){
+		for( int y = 0; y < waldoImage.getHeight(); y++){
+		    
+		    Integer color = waldoImage.getRGB(x,y);
+		    Color col = new Color(color);
+
+		    Float red = (float) col.getRed()/255.0f;
+		    Float blue = (float) col.getBlue()/ 255.0f;
+		    Float green = (float) col.getGreen()/255.0f;
+
+		    Float rgDiff = Math.abs(red - green);
+		    Float rbDiff = Math.abs(red - blue);
+		    Float bgDiff = Math.abs(blue - green);
+
+		    if (red >= (blue + green) && blue <= 0.2f && green <= 0.2f){			
+			countRed += 1;
+		    }
+		    else if (red >= 0.8f  && blue >= 0.8f && green >= 0.8f){
+			countWhite += 1;
+		    }			
 		}
 	    }
-	    
-	    BufferedImage otherImage = ImageIO.read(new File(imagePath[1]));
-	    
-	    Hashtable<Integer, Integer> histogram2 = new Hashtable<Integer, Integer>();
 
-	    for( int x = 0; x < otherImage.getWidth(); x++){
-		for( int y = 0; y < otherImage.getHeight(); y++){
-		    Integer color = otherImage.getRGB(x,y);
-		    color = editColor(color);	    
-		    
-		    Integer numOccurences = histogram2.get(color);
-		    
-		    if (numOccurences == null){
-			histogram2.put(color, 1);
-		    } else{
-			histogram2.put(color, numOccurences + 1);
-		    } 
-		}
+	    System.out.println(countRed);
+	    float whiteProp = (float) countWhite/ (float) waldoPixels;
+	    float redProp = (float) countRed/ (float) waldoPixels;
+	   
+	    System.out.println(whiteProp + " " + redProp);
+	    if(redProp >= 0.07){
+		System.out.println("WALDO IS HERE");
+	    } else {
+		System.out.println("WALDO IS NOT HERE");
 	    }
 	    
-	    System.out.println(histogramSimilarity(histogram, histogram2));
-	    System.out.println(histogramSimilarity2(histogram, histogram2));
-
-	}
+	    
+	} 
 	catch (IOException e){
 	    System.out.println("Waldo is not in there");
 	}
