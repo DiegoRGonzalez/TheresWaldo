@@ -57,7 +57,11 @@ public class TheresWaldo {
 	    BufferedImage subimage = image.getSubimage(x, y, 2 * extraWidth, 2 * extraHeight);
 	    subimages.add(new Subimage(subimage, x, y));
 	}
+    
+	return subimages;
+}
 
+    public void writeSubimages(Vector<Subimage> subimages) {
 	for(int i = 0; i < subimages.size(); i++){
 	    try{
 		File outputfile = new File("subimage"+i+".jpg");
@@ -66,7 +70,5 @@ public class TheresWaldo {
 		System.out.println("There was a problem");
 	    }	
 	}
-
-	return subimages;
     }
 }

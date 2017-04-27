@@ -42,61 +42,62 @@ public class Histogram {
 	}
     }
     */
-    
-    public Histogram(String[] imagePath) {
-	try {
-	    BufferedImage waldoImage = ImageIO.read(new File(imagePath[0]));
-	    
-	    Hashtable<Integer, Integer> waldoHist = new Hashtable<Integer, Integer>();
+    public Histogram() {}
 
-	    int waldoPixels = waldoImage.getWidth() * waldoImage.getHeight();
+    public Vector<Subimage> classify(Vector<Subimage> subimages) {
+	Vector<Subimage> filter = new Vector<Subimage>();
+	
+	for(int i = 0; i < subimages.size(); i++) {
+	    Subimage image = subimages.get(i);
+	    if(classifyImage(image.getImage())){
+		filter.add(image);
+	    }
+	}
+	return filter;
+    }
 
-	    int countRed = 0;
-	    int countWhite = 0;
-	    for( int x = 0; x < waldoImage.getWidth(); x++){
-		for( int y = 0; y < waldoImage.getHeight(); y++){
-		    
-		    Integer color = waldoImage.getRGB(x,y);
-		    Color col = new Color(color);
+    public boolean classifyImage(BufferedImage waldoImage) {
+	Hashtable<Integer, Integer> waldoHist = new Hashtable<Integer, Integer>();
+	
+	int waldoPixels = waldoImage.getWidth() * waldoImage.getHeight();
+	
+	int countRed = 0;
+	int countWhite = 0;
+	for( int x = 0; x < waldoImage.getWidth(); x++){
+	    for( int y = 0; y < waldoImage.getHeight(); y++){
+		
+		Integer color = waldoImage.getRGB(x,y);
+		Color col = new Color(color);
+		
+		Float red = (float) col.getRed()/255.0f;
+		Float blue = (float) col.getBlue()/ 255.0f;
+		Float green = (float) col.getGreen()/255.0f;
 
-		    Float red = (float) col.getRed()/255.0f;
-		    Float blue = (float) col.getBlue()/ 255.0f;
-		    Float green = (float) col.getGreen()/255.0f;
-
-		    Float rgDiff = Math.abs(red - green);
+		Float rgDiff = Math.abs(red - green);
 		    Float rbDiff = Math.abs(red - blue);
 		    Float bgDiff = Math.abs(blue - green);
-
-		    if (red >= (blue + green) && blue <= 0.2f && green <= 0.2f){			
+		    
+		    if (red >= blue && red >= green && blue <= 0.2f && green <= 0.2f){			
 			countRed += 1;
 		    }
-		    else if (red >= 0.8f  && blue >= 0.8f && green >= 0.8f){
+		    else if (red >= 0.7f  && blue >= 0.4f && green >= 0.4f){
 			countWhite += 1;
 		    }			
-		}
 	    }
-
-	    System.out.println(countRed);
-	    float whiteProp = (float) countWhite/ (float) waldoPixels;
-	    float redProp = (float) countRed/ (float) waldoPixels;
-	   
-	    System.out.println(whiteProp + " " + redProp);
-	    if(redProp >= 0.07){
-		System.out.println("WALDO IS HERE");
-	    } else {
-		System.out.println("WALDO IS NOT HERE");
-	    }
-	    
-	    
-	} 
-	catch (IOException e){
-	    System.out.println("Waldo is not in there");
 	}
-    }
-
-    public static void main(String[] argv){
 	
-	new Histogram(argv);
+	//	System.out.println(countRed);
+	float whiteProp = (float) countWhite/ (float) waldoPixels;
+	float redProp = (float) countRed/ (float) waldoPixels;
+	
+	//System.out.println(whiteProp + " " + redProp);
+	if(redProp >= 0.07 && whiteProp >= 0.01f){
+	    //  System.out.println("WALDO IS HERE");
+	    return true;
+	} else {
+	    //System.out.println("WALDO IS NOT HERE");
+	    return false;
+	}	
+	
     }
-
 }
