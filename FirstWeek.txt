@@ -1,0 +1,19 @@
+# TheresWaldo
+Where's Waldo? There's Waldo!
+
+For this first week we planned to implement a basic image search that would be able to pick out Waldo out of an image filled with noise and a single Waldo. We had a stretch goal to have our program identify all possible Waldos in a Where's Waldo image. We surprisingly managed to reach this goal.
+
+Our program currently works in three steps:
+1 ) It determines a subimage size by using edge detection to estimate the size of a person in the image. This is done in EdgeDetector.java
+2) It breaks down the image into some number of sub images. These are stored in the Subimage class, which also stores relevant information such as the coordinates of the subimage in the larger image. In the future, this will allow us to point to the actual Waldo image.
+3) Filters out some of the subimages by measuring the percentage of red and white pixels and throwing away subimages with an undesirable pixel composition. This is done in Histogram.java.
+
+To run, the program is started using Main.java. The user must then provide a path to a “Where’s Waldo” image, such as the one found here. 
+
+Our program is able to cut the search space of subimages by at least a third and Waldo is consistently one of the remaining images. The program works better on certain where's waldo images than others, mostly due to the color balance of the image. 
+
+We believe that with improvements, this approach could potentially cut the search space in half, at the very least. However, we first need to be able to dynamically adjust the constants we use to test whether or not an image contains enough red and white pixels. For now, we have found that 7% red and 1% white is a good minimum, because the sub-images may have a lot of other objects besides Waldo. This works well for some images, but not for others, especially those with a lot of red and white objects. However, by checking that both colors exist, we are able to block images that contain only one or none of those two colors.
+
+Along the same lines, we also need to be able to better determine what truly constitutes a red and white pixel. Currently, we call any pixel “red,” if the red channel is higher than both the blue and green channels, and the blue and green channels are lower than a certain value. White pixels have been harder to classify, however. Since Waldo tends to be rather small, the red and white pixels tend to bleed through each other, so white pixels turn out to be more “pink” than true white. To adjust for this, we call any pixel white if all of the pixels are higher than a certain threshold, with red having a much higher threshold than the other two (which have the same threshold), in order to catch “pink” colors. 
+
+We believe that we need to be able to dynamically adjust these definitions of red and white pixels, in order to get better results. This is because red and white are the most recognizable features of Waldo, at least in terms of color, but each image has different hues of red and white. For example, in one image, Waldo may have a dark red and bright white hat, and in another a light red and dull white hat. One way that we have discussed to get around this problem is by adjusting the image’s hue and normalizing the colors. If we are able to distinguish the way red and white are represented in any image, we can find Waldo much more efficiently.
