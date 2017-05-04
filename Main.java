@@ -8,42 +8,51 @@ import java.util.Vector;
 
 public class Main {
 
+    private static void usage(){
+	System.out.println("ERROR");
+	System.out.println("java Main #WaldoImages WaldoImageFolderFiles WheresWaldoImage");
+	System.exit(1);
+    }
+    
     //Main method of our whole program
     public static void main(String[] argv){
 	Scanner scan = new Scanner(System.in);
 	EdgeDetector ed = new EdgeDetector();
 	Classifier classifier = new Classifier();
+	ColorCorrection corrector = new ColorCorrection();
+	int argLen = argv.length;
 
-	while(true){
-	    System.out.println("Please input an image file that contains a Waldo:");
-	    String path = scan.next();
-	    try {
-		//Save the Waldo image given to us
-		//BufferedImage image= ImageIO.read(new File(path));
-		//TheresWaldo theresWaldo = new TheresWaldo(image);
-
-		//Runs the edge detector and creates a list of subimages of the original image
-		//based on the result of that edge detector
-		//int[] window = ed.getSpliceSize(image);
-		//Vector<Subimage> subimages = theresWaldo.createSubimages(window[0],window[1]);
-		
-		BufferedImage im = ImageIO.read(new File(path));
+	try{
+	    int num = Integer.parseInt(argv[0]);
+	
+	    int i = 1;
+	    Vector<Subimage> waldoImages = new Vector<Subimage>();
+	    for(; i <= num; i++){
+		BufferedImage im = ImageIO.read(new File(argv[i]));
 		Subimage sub = new Subimage(im, 0, 0);
-		Histogram hist = new Histogram(sub);
+		waldoImages.add(sub);
 		
-		/*
-		//Classify the Vector of Subimages and prune them to the ones we believe might contain
-		//Waldo based on the histogram of that Subimage
-		System.out.println("Original # subimages: "+subimages.size());
-		subimages = classifier.classify(subimages);
-		System.out.println("Trimmed # subimages: "+subimages.size());
-		*/
-		//Write the subimages to the directory for debugging purposes
-		//theresWaldo.writeSubimages(subimages);
-	    } catch(IOException e){
-		System.out.println("Not a valid image file!");
-		continue;
 	    }
+	    classifier.setStandard(waldoImages);
+	    
+	    
+	    BufferedImage image = ImageIO.read(new File(argv[i]));
+	    image = corrector.normalize(image);
+
+	    TheresWaldo theresWaldo = new TheresWaldo(image);
+
+	    int[] window = ed.getSpliceSize(image);
+
+	    Vector<Subimage> subimages = theresWaldo.createSubimages(window[0],window[1]);
+	    
+	    subimages = classifier.classify(subimages);
+
+	    theresWaldo.writeSubimages(subimages);
+
+	} catch (Exception e){
+	    System.out.println(e);
+	    e.printStackTrace();
+	    usage();
 	}
     }
 }

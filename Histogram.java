@@ -8,6 +8,8 @@ import java.awt.Color;
 import java.util.Hashtable;
 import java.util.*;
 import java.lang.*;
+import java.awt.image.WritableRaster;
+import java.awt.image.ColorModel;
 
 /* A class to develop a color histogram of images to filter for Waldo
  * 
@@ -19,18 +21,35 @@ import java.lang.*;
 
 public class Histogram {
     
-    private Hashtable<Integer, Float> hist = new Hashtable<Integer, Float>();
+    // copies a bufferedImage with no connection to the original 
+    private static BufferedImage deepCopy(BufferedImage bi) {
+	/*
+	ColorModel cm = bi.getColorModel();
+	boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
+	WritableRaster raster = bi.copyData(null);
+	return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
+	*/
 
-    public Histogram () {}
+	BufferedImage newImage = new BufferedImage(bi.getWidth(), bi.getHeight(),bi.getType());
+	for (int x = 0; x < bi.getWidth(); x++){
+	    for(int y = 0; y < bi.getHeight(); y++){
+		newImage.setRGB(x,y,bi.getRGB(x,y));
+	    }
+	}
 
-    
+	return newImage;
+    }
+
+    private float waldoConfidence = 0.0f;
+
+    public Histogram () {}    
 
     public Histogram (Subimage image) {
 	generateHistogram(image);
     }
 
-    public Hashtable<Integer, Float> getHistogram() {
-	return hist;
+    public float getWaldoConfidence(){
+	return waldoConfidence;
     }
     
     /* Classify the image according to whether or not Waldo may be there
@@ -39,16 +58,15 @@ public class Histogram {
      * and pink (white-red bleed through).
      */
     private void generateHistogram(Subimage waldoSubimage) {
-	int bitAmount = 15;
 	float bitAmountf = 15.0f;
 
-	BufferedImage waldoImage = waldoSubimage.getImage();
+	BufferedImage wim = waldoSubimage.getImage();
+	
+	BufferedImage waldoImage = deepCopy(wim);
+	
 	BufferedImage writeImage = new BufferedImage(waldoImage.getWidth(), waldoImage.getHeight(), waldoImage.getType());
 	int[] loc = waldoSubimage.getLocation();
 	Subimage writeSubimage = new Subimage(writeImage, loc[0], loc[1]);
-
-	BufferedImage bit12Image = new BufferedImage(waldoImage.getWidth(), waldoImage.getHeight(), waldoImage.getType());
-	Subimage bit12Subimage = new Subimage(bit12Image, loc[0], loc[1]);
 
 	ColorCorrection colCorrector = new ColorCorrection();
 
@@ -84,9 +102,8 @@ public class Histogram {
 		Integer rgDiff = red-green;
 		Integer bgDiff = Math.abs(blue-green);
 
-		boolean wCheck = Math.abs(rbDiff) <= 2 && Math.abs(rgDiff) <= 2 && bgDiff <= 2;
-		boolean rCheck = !wCheck && rbDiff >= 3 && rgDiff >= 3 && bgDiff <= 1;
-		
+		boolean wCheck = Math.abs(rbDiff) <= 3 && Math.abs(rgDiff) <= 3 && bgDiff <= 2;
+		boolean rCheck = !wCheck && rbDiff >= 4 && rgDiff >= 4 && bgDiff <= 2;
 		
 		// Check red and white
 		if(!(wCheck || rCheck)){
@@ -121,95 +138,19 @@ public class Histogram {
 		}		
 	    }
 	}
-	/*
+	
 	for( int x = 0; x < writeImage.getWidth(); x++){
 	    for( int y = 0; y < writeImage.getHeight(); y++){
 		Color color = new Color(writeImage.getRGB(x,y));
 		if (!color.equals(Color.WHITE)){
-		    writeImage.setRGB(x,y, 0);
+		    waldoConfidence += 1.0f;
 		}
 	    }
 	}
-	*/
 	
-	bit12Subimage.writeImage("12bitImage.jpg");
-	writeSubimage.writeImage("WaldoHist.jpg");
-	waldoSubimage.writeImage("test.jpg");
+	waldoConfidence /= waldoPixels;
+	
+	//writeSubimage.writeImage("WaldoHist.jpg");
+	//waldoSubimage.writeImage("test.jpg");
     }
 }
-
-
-
-
-    /* Classify the image according to whether or not Waldo may be there
-     * Currently classifies based on how much red appears in the image.
-     * More robust classifications to follow, especially to include white
-     * and pink (white-red bleed through).
-     */
-    /*
-    private void generateHistogram(Subimage waldoSubimage) {
-	
-	BufferedImage waldoImage = waldoSubimage.getImage();
-	// The number of pixels in the image to find frequencies of colors
-	int waldoPixels = waldoImage.getWidth() * waldoImage.getHeight();
-	
-	Hashtable<Integer, Float> counts = new Hashtable<Integer, Float>();
-
-	for( int x = 0; x < waldoImage.getWidth(); x++){
-	    for( int y = 0; y < waldoImage.getHeight(); y++){
-		
-		// Get the RGB value of the image
-		Integer color = waldoImage.getRGB(x,y);
-
-		// Separate the Red, Green and Blue values.
-		Color col = new Color(color);
-
-		Integer red = (Integer) col.getRed();
-		Integer blue = (Integer) col.getBlue();
-		Integer green = (Integer) col.getGreen();	      
-		
-		Integer rbDiff = red-blue;
-		Integer rgDiff = red-green;
-
-		// Check red and white
-		if((rbDiff > 10 && rgDiff > 10) || (rbDiff > -15 && rbDiff < 15 && rgDiff > -15 && rgDiff < 15)){
-		    
-		    Float rPercent = red/255.0f;
-		    Float gPercent = green/255.0f;
-		    Float bPercent = blue/255.0f;
-		
-		    Integer newR = (Integer) Math.round(rPercent * 15.0f);
-		    Integer newG = (Integer) Math.round(gPercent * 15.0f);
-		    Integer newB = (Integer) Math.round(bPercent * 15.0f);
-		    
-		    color = (newR & 0xf) << 8 + (newG & 0xf) << 4 + newB & 0xf;
-		    
-		    Float count = counts.get(color);
-
-		    if (count == null) {
-			counts.put(color, count + 1.0f);
-		    } else {
-			counts.put(color, 0.0f);
-		    }
-		}
-	    }
-	}
-	
-	Set<Integer> keys = counts.keySet();
-        for(Integer key: keys){
-            hist.put(key, counts.get(key)/(float) waldoPixels);
-        }
-    }
-*/
-
-
-		// rP = red/bitAmountf;
-		// bP = blue/bitAmountf;
-		// gP = green/bitAmountf;
-		
-		// Integer r = (int) (rP * 255.0f);
-		// Integer b = (int) (bP * 255.0f);
-		// Integer g = (int) (gP * 255.0f);
-
-		// Color tbit = new Color(r,b,g);
-		// bit12Image.setRGB(x, y, tbit.getRGB());

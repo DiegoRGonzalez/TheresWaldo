@@ -134,7 +134,7 @@ public class EdgeDetector {
 
 	//Double the size of the person to make sure we get people inside our subimages
 	return new int[]{2*size,2*size};
-
+	//return new int[]{25, 25};
 
     }
 
