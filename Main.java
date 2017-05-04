@@ -24,11 +24,12 @@ public class Main {
 		//Runs the edge detector and creates a list of subimages of the original image
 		//based on the result of that edge detector
 		int[] window = ed.getSpliceSize(image);
-		Vector<Subimage> subimages = theresWaldo.createSubimages(window[0],window[1]);
+		Vector<Subimage> subimages = theresWaldo.createSubimages(25,25);
 		
 		//Classify the Vector of Subimages and prune them to the ones we believe might contain
 		//Waldo based on the histogram of that Subimage
 		System.out.println("Original # subimages: "+subimages.size());
+		
 		subimages = hist.classify(subimages);
 		System.out.println("Trimmed # subimages: "+subimages.size());
 		
