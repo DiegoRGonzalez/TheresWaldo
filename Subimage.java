@@ -1,5 +1,8 @@
 //(c) 2017 John Freeman, Diego Gonzalez, Jose Rivas
 import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
+import java.io.IOException;
+import java.io.File;
 
 //Simple class to save a buffered image and x and y value that corresponds to
 //a small portion of the original image
@@ -34,5 +37,15 @@ public class Subimage {
 
     public int getHeight() {
 	return image.getHeight();
+    }
+
+    public boolean writeImage(String path){
+	try{
+	    File outputfile = new File(path);
+	    ImageIO.write(getImage(), "jpg", outputfile);
+	    return true;
+	} catch(IOException e) {
+	    return false;
+	}	
     }
 }

@@ -18,52 +18,143 @@ import java.lang.*;
  */
 
 public class Histogram {
+    
+    private Hashtable<Integer, Float> hist = new Hashtable<Integer, Float>();
 
-    public Histogram() {}
+    public Histogram () {}
 
-    /* Takes a vector of Subimages and classifies them as either Waldo or Not Waldo.
-     * The method calls "classify image" which classifies according to how much
-     * red and white appears in the image.
-     *
-     * Right now, we really need to think about maybe looping through this multiple times
-     * with adjustable parameters for finding red and white. This way, we can continue to 
-     * filter until only half (at most) of the images are left. 
+    
+
+    public Histogram (Subimage image) {
+	generateHistogram(image);
+    }
+
+    public Hashtable<Integer, Float> getHistogram() {
+	return hist;
+    }
+    
+    /* Classify the image according to whether or not Waldo may be there
+     * Currently classifies based on how much red appears in the image.
+     * More robust classifications to follow, especially to include white
+     * and pink (white-red bleed through).
      */
-    public Vector<Subimage> classify(Vector<Subimage> subimages) {
+    private void generateHistogram(Subimage waldoSubimage) {
+	int bitAmount = 15;
+	float bitAmountf = 15.0f;
+
+	BufferedImage waldoImage = waldoSubimage.getImage();
+	BufferedImage writeImage = new BufferedImage(waldoImage.getWidth(), waldoImage.getHeight(), waldoImage.getType());
+	int[] loc = waldoSubimage.getLocation();
+	Subimage writeSubimage = new Subimage(writeImage, loc[0], loc[1]);
+
+	BufferedImage bit12Image = new BufferedImage(waldoImage.getWidth(), waldoImage.getHeight(), waldoImage.getType());
+	Subimage bit12Subimage = new Subimage(bit12Image, loc[0], loc[1]);
+
+	ColorCorrection colCorrector = new ColorCorrection();
+
+	waldoImage = colCorrector.normalize(waldoImage);
 	
-	// A Vector holding only those images that belong to Waldo
-	Vector<Subimage> filter = new Vector<Subimage>();
+	// The number of pixels in the image to find frequencies of colors
+	int waldoPixels = waldoImage.getWidth() * waldoImage.getHeight();
 	
-	for(int i = 0; i < subimages.size(); i++) {
-	    Subimage image = subimages.get(i);
-	    
-	    // Classify a single image. If Waldo may be there, add it to filter.
-	    if(classifyImage(image.getImage())){
-		filter.add(image);
+	Hashtable<Integer, Float> counts = new Hashtable<Integer, Float>();
+
+	for( int x = 0; x < waldoImage.getWidth(); x++){
+	    for( int y = 0; y < waldoImage.getHeight(); y++){
+		
+		// Get the RGB value of the image
+		Integer rgbVal = waldoImage.getRGB(x,y);
+
+		// Separate the Red, Green and Blue values.
+		Color col = new Color(rgbVal);
+
+		Integer red = (Integer) col.getRed();
+		Integer blue = (Integer) col.getBlue();
+		Integer green = (Integer) col.getGreen();	      
+		
+		float rP = (float) red/255.0f;
+		float gP = (float) green/255.0f;
+		float bP = (float) blue/255.0f;
+
+		red =  (int) (rP * bitAmountf);		
+		blue =  (int) (bP * bitAmountf);
+		green = (int) (gP * bitAmountf);
+				           
+		Integer rbDiff = red-blue;
+		Integer rgDiff = red-green;
+		Integer bgDiff = Math.abs(blue-green);
+
+		boolean wCheck = Math.abs(rbDiff) <= 2 && Math.abs(rgDiff) <= 2 && bgDiff <= 2;
+		boolean rCheck = !wCheck && rbDiff >= 3 && rgDiff >= 3 && bgDiff <= 1;
+		
+		
+		// Check red and white
+		if(!(wCheck || rCheck)){
+		    
+		    waldoImage.setRGB(x, y, Color.BLACK.getRGB());
+		   
+		} else {
+		    int maxChannel = 255;
+		    
+		    Color pixCol = (rCheck) ? new Color(maxChannel, 0, 0) : new Color(0, maxChannel, maxChannel);
+		    waldoImage.setRGB(x,y,pixCol.getRGB());
+		    
+		    for(int i = x - 2; i <= x; i++){
+			if(i >= 0) {
+			    for(int j = y - 2; j <= y; j++){
+				if (j >= 0) {
+				    Color col2 = new Color(waldoImage.getRGB(i,j));
+				    
+				    if (col2.getRGB() != Color.BLACK.getRGB()) {
+					Color iterRGB = new Color(waldoImage.getRGB(i,j));
+
+					if(!col2.equals(pixCol) || iterRGB.equals(Color.WHITE)) { 
+					    writeImage.setRGB(x, y, Color.WHITE.getRGB());
+					    writeImage.setRGB(i, j, Color.WHITE.getRGB());
+					}
+				    }
+				}
+			    }
+			}   
+		    }
+		    
+		}		
 	    }
 	}
-
-	// Returned the filtered vector
-	return filter;
+	/*
+	for( int x = 0; x < writeImage.getWidth(); x++){
+	    for( int y = 0; y < writeImage.getHeight(); y++){
+		Color color = new Color(writeImage.getRGB(x,y));
+		if (!color.equals(Color.WHITE)){
+		    writeImage.setRGB(x,y, 0);
+		}
+	    }
+	}
+	*/
+	
+	bit12Subimage.writeImage("12bitImage.jpg");
+	writeSubimage.writeImage("WaldoHist.jpg");
+	waldoSubimage.writeImage("test.jpg");
     }
+}
+
+
+
 
     /* Classify the image according to whether or not Waldo may be there
      * Currently classifies based on how much red appears in the image.
      * More robust classifications to follow, especially to include white
      * and pink (white-red bleed through).
      */
-    public boolean classifyImage(BufferedImage waldoImage) {
-
-	// Hashtable to keep count of Colors that appear (will be useful when doing more
-	// intense work with Colors). Will change to keep frequencies, also, not counts.
-	// Hashtable<Integer, Integer> waldoHist = new Hashtable<Integer, Integer>();
+    /*
+    private void generateHistogram(Subimage waldoSubimage) {
 	
+	BufferedImage waldoImage = waldoSubimage.getImage();
 	// The number of pixels in the image to find frequencies of colors
 	int waldoPixels = waldoImage.getWidth() * waldoImage.getHeight();
 	
-	// Count the red and white pixels
-	int countRed = 0;
-	int countWhite = 0;
+	Hashtable<Integer, Float> counts = new Hashtable<Integer, Float>();
+
 	for( int x = 0; x < waldoImage.getWidth(); x++){
 	    for( int y = 0; y < waldoImage.getHeight(); y++){
 		
@@ -71,56 +162,54 @@ public class Histogram {
 		Integer color = waldoImage.getRGB(x,y);
 
 		// Separate the Red, Green and Blue values.
-		Color col = new Color(color);		
-		Float red = (float) col.getRed()/255.0f;
-		Float blue = (float) col.getBlue()/ 255.0f;
-		Float green = (float) col.getGreen()/255.0f;
+		Color col = new Color(color);
 
-		// Perhaps will be useful later to test just how much more of a color there
-		// is compared to another color.
-		Float rgDiff = Math.abs(red - green);
-		Float rbDiff = Math.abs(red - blue);
-		Float bgDiff = Math.abs(blue - green);
+		Integer red = (Integer) col.getRed();
+		Integer blue = (Integer) col.getBlue();
+		Integer green = (Integer) col.getGreen();	      
+		
+		Integer rbDiff = red-blue;
+		Integer rgDiff = red-green;
+
+		// Check red and white
+		if((rbDiff > 10 && rgDiff > 10) || (rbDiff > -15 && rbDiff < 15 && rgDiff > -15 && rgDiff < 15)){
 		    
-		// If the color has more red than any of the others, and the blue and green colors
-		// are low, then it is definitely red. The constants need work, as they do not
-		// capture all possible red values. We really need to fine tune this and make it
-		// so the constants change according to how the picture is working.
-		// One possible thing is to find the average hue of the color and work it in.
-		if (red >= blue && red >= green && blue <= 0.2f && green <= 0.2f){ 
-		    countRed += 1;
+		    Float rPercent = red/255.0f;
+		    Float gPercent = green/255.0f;
+		    Float bPercent = blue/255.0f;
+		
+		    Integer newR = (Integer) Math.round(rPercent * 15.0f);
+		    Integer newG = (Integer) Math.round(gPercent * 15.0f);
+		    Integer newB = (Integer) Math.round(bPercent * 15.0f);
+		    
+		    color = (newR & 0xf) << 8 + (newG & 0xf) << 4 + newB & 0xf;
+		    
+		    Float count = counts.get(color);
+
+		    if (count == null) {
+			counts.put(color, count + 1.0f);
+		    } else {
+			counts.put(color, 0.0f);
+		    }
 		}
-		// In this case, white includes those colors with a pink hue. This helps with
-		// bleed through, when the red pixels and the white pixels become one, so the
-		// pixel is pink, not white.
-		else if (red >= 0.7f  && blue >= 0.4f && green >= 0.4f){
-		    countWhite += 1;
-		}			
 	    }
 	}
 	
-	//	System.out.println(countRed);
-	
-	// Get the proportion of whtie and red pixels in the image.
-	float whiteProp = (float) countWhite/ (float) waldoPixels;
-	float redProp = (float) countRed/ (float) waldoPixels;
-	
-	
-	//System.out.println(whiteProp + " " + redProp);
-	
-	// If more than 7% of the image is red and 1% is "white", then there is a chance
-	// that Waldo is there. These numbers should be adjustable. However, for now they
-	// seem to be working. This of course does not help to stop those images that 
-	// have a lot of distractions. However, it does help get rid of those images that
-	// we should never even try to look at. 
-	if(redProp >= 0.07 && whiteProp >= 0.01f){
-	    //  System.out.println("WALDO IS HERE");
-	    return true;
-	} else {
-	    //System.out.println("WALDO IS NOT HERE");
-	    return false;
-	}	
-	
+	Set<Integer> keys = counts.keySet();
+        for(Integer key: keys){
+            hist.put(key, counts.get(key)/(float) waldoPixels);
+        }
     }
+*/
 
-}
+
+		// rP = red/bitAmountf;
+		// bP = blue/bitAmountf;
+		// gP = green/bitAmountf;
+		
+		// Integer r = (int) (rP * 255.0f);
+		// Integer b = (int) (bP * 255.0f);
+		// Integer g = (int) (gP * 255.0f);
+
+		// Color tbit = new Color(r,b,g);
+		// bit12Image.setRGB(x, y, tbit.getRGB());

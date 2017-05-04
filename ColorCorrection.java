@@ -5,15 +5,6 @@ import javax.imageio.ImageIO;
 import java.io.IOException;
 import java.awt.Color;
 
-
-
-
-
-
-
-
-
-
 public class ColorCorrection {
 
 
@@ -69,10 +60,6 @@ public class ColorCorrection {
 	SDBlue /= numPixels;
 	SDBlue = (float)Math.sqrt(SDBlue);
 
-	System.out.println("SDRGB: " + SDRed + ", " + SDGreen + ", " + SDBlue);
-	System.out.println("AvgRGB: " + averageRed + ", " + averageGreen + ", " + averageBlue);
-
-
 	float maxRed = 0;
 	float minRed = 255;
 	float maxBlue = 0;
@@ -97,18 +84,10 @@ public class ColorCorrection {
 	
 	    }
 	}
-
-	System.out.println("R: " + maxRed + " " + minRed);
-	System.out.println("G: " + maxGreen + " " + minGreen);
-	System.out.println("B: " + maxBlue + " " + minBlue);
 	
 	maxRed = (minRed < 0) ? maxRed + Math.abs(minRed) : maxRed - minRed;
 	maxGreen = (minGreen < 0) ? maxGreen + Math.abs(minGreen) : maxGreen - minGreen;
 	maxBlue = (minBlue < 0) ? maxBlue + Math.abs(minBlue) : maxBlue - minBlue;
-	
-	System.out.println("R: " + maxRed + " " + minRed);
-	System.out.println("G: " + maxGreen + " " + minGreen);
-	System.out.println("B: " + maxBlue + " " + minBlue);
 	
 	for( int i = 0; i < image.getWidth(); i++){
 	    for( int j = 0; j < image.getHeight(); j++){

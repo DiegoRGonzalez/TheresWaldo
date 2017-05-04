@@ -86,12 +86,7 @@ public class TheresWaldo {
     //Write a Vector of subimages to the home directory
     public void writeSubimages(Vector<Subimage> subimages) {
 	for(int i = 0; i < subimages.size(); i++){
-	    try{
-		File outputfile = new File("subimage"+i+".jpg");
-		ImageIO.write(subimages.get(i).getImage(), "jpg", outputfile);
-	    } catch(IOException e) {
-		System.out.println("There was a problem");
-	    }	
+	    subimages.get(i).writeImage("Subimage" + i + ".jpg");
 	}
     }
 }
