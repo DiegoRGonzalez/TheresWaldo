@@ -9,8 +9,8 @@ public class Trainer{
 
     public Trainer() {
 	try{
-	    FileReader trainreader = new FileReader("crop_price.arff");
-	    FileReader testreader = new FileReader("crop_pricetest.arff");
+	    FileReader trainreader = new FileReader("WaldoSet1.arff");
+	    FileReader testreader = new FileReader("WaldoTestSet2.arff");
 	    
 	    Instances train = new Instances(trainreader);
 	    Instances test = new Instances(testreader);

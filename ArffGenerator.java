@@ -1,4 +1,4 @@
-//(c) John Freeman, Diego Gonzalez, Jose Rivas
+//(c) 2017 John Freeman, Diego Gonzalez, Jose Rivas
 import java.io.File;
 import java.io.IOException;
 import java.io.FileNotFoundException;
@@ -8,7 +8,6 @@ import java.util.Scanner;
 import java.io.PrintWriter;
 import java.awt.Color;
 
-//Currently, a class that does the creation and writing of subimages of the original image
 public class ArffGenerator {
 
     public ArffGenerator() {}
@@ -24,6 +23,19 @@ public class ArffGenerator {
 	
 	return attr;
     }
+
+    public String imageToArff(BufferedImage image) {
+	String data = "";
+	for(int x = 0; x < image.getWidth(); x++) {
+	    for(int y = 0; y < image.getHeight(); y++) {
+		Color color = new Color(image.getRGB(x, y));
+		data += color.getRed() + ",";
+		data += color.getGreen() + ",";
+		data += color.getBlue() + ",";
+	    }
+	}
+	return data.substring(0,data.length()-1);
+    }
     
     public static void main(String[] args) {
 	ArffGenerator ag = new ArffGenerator();
@@ -38,31 +50,16 @@ public class ArffGenerator {
 		
 		Scanner in = new Scanner(System.in);
 		System.out.println("Give file of images to make an .arff file");
-		String foldername = in.next();
+		String foldername = args[1];
 		File folder = new File(foldername);
 		String[] files = folder.list();
 		try {
 		    for(int i = 0; i < files.length; i++) {
 			String filename = files[i];
 			BufferedImage image = ImageIO.read(new File(foldername + "/" + filename));
-			String data = "";
-			for(int x = 0; x < image.getWidth(); x++) {
-			    for(int y = 0; y < image.getHeight(); y++) {
-				Color color = new Color(image.getRGB(x, y));
-				data += color.getRed() + ",";
-				data += color.getGreen() + ",";
-				data += color.getBlue() + ",";
-			    }
-			}
-			data += (filename.toLowerCase().contains("waldo")) ? "yes\n" : "no\n";
-
-			if((filename.toLowerCase().contains("waldo"))){
-			    //System.out.println(data);
-			}
-
-			
+			String data = ag.imageToArff(image);
+			data += (filename.toLowerCase().contains("waldo")) ? ",yes\n" : ",no\n";
 			out.print(data);
-			
 		    }
 		    out.close();
 		} catch(IOException e) {
