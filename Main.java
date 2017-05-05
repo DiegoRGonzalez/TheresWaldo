@@ -48,6 +48,7 @@ public class Main {
 	    Vector<Subimage> subimages = theresWaldo.createSubimages(window[0],window[1]);
 	    
 	    subimages = classifier.classify(subimages);
+
 	    Vector<Subimage> sd0To1 = classifier.classifyByStandardDev(subimages, 0.0f, 1.0f);
 	    Vector<Subimage> sd1To2 = classifier.classifyByStandardDev(subimages, 1.0f, 2.0f);
 	    Vector<Subimage> sd2To3 = classifier.classifyByStandardDev(subimages, 2.0f, 3.0f);
