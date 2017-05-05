@@ -27,7 +27,7 @@ public class WaldoChecker {
     
     public WaldoChecker (Vector<Subimage> waldoImages) {
 	for (int i = 0; i < waldoImages.size(); i++){
-	    Histogram hist = new Histogram(waldoImages.get(i));
+	    Histogram hist = waldoImages.get(i).getHistogram();
 	    waldograms.add(hist);
 	}
     }
@@ -43,7 +43,7 @@ public class WaldoChecker {
     }
     
     public boolean isWaldo(Subimage image){
-	Histogram hist = new Histogram(image);
+	Histogram toCheck = image.getHistogram();
 	
 	
 

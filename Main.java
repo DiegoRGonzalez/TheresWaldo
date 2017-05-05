@@ -5,6 +5,8 @@ import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.util.Scanner;
 import java.util.Vector;
+import java.util.Comparator;
+import java.util.PriorityQueue;
 
 public class Main {
 
@@ -46,8 +48,14 @@ public class Main {
 	    Vector<Subimage> subimages = theresWaldo.createSubimages(window[0],window[1]);
 	    
 	    subimages = classifier.classify(subimages);
-
-	    theresWaldo.writeSubimages(subimages);
+	    Vector<Subimage> sd0To1 = classifier.classifyByStandardDev(subimages, 0.0f, 1.0f);
+	    Vector<Subimage> sd1To2 = classifier.classifyByStandardDev(subimages, 1.0f, 2.0f);
+	    Vector<Subimage> sd2To3 = classifier.classifyByStandardDev(subimages, 2.0f, 3.0f);
+	    
+	    theresWaldo.writeSubimages(sd0To1, "SD0To1/Subimage");
+	    theresWaldo.writeSubimages(sd1To2, "SD1To2/Subimage");
+	    theresWaldo.writeSubimages(sd2To3, "SD2To3/Subimage");
+	    
 
 	} catch (Exception e){
 	    System.out.println(e);

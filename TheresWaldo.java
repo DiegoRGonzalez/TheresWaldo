@@ -89,4 +89,11 @@ public class TheresWaldo {
 	    subimages.get(i).writeImage("Subimage" + i + ".jpg");
 	}
     }
+
+    //Write a Vector of subimages with a specific path name
+    public void writeSubimages(Vector<Subimage> subimages, String path) {
+	for(int i = 0; i < subimages.size(); i++){
+	    subimages.get(i).writeImage(path + i + ".jpg");
+	}
+    }
 }

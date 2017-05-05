@@ -23,12 +23,6 @@ public class Histogram {
     
     // copies a bufferedImage with no connection to the original 
     private static BufferedImage deepCopy(BufferedImage bi) {
-	/*
-	ColorModel cm = bi.getColorModel();
-	boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
-	WritableRaster raster = bi.copyData(null);
-	return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
-	*/
 
 	BufferedImage newImage = new BufferedImage(bi.getWidth(), bi.getHeight(),bi.getType());
 	for (int x = 0; x < bi.getWidth(); x++){
@@ -44,7 +38,7 @@ public class Histogram {
 
     public Histogram () {}    
 
-    public Histogram (Subimage image) {
+    public Histogram (BufferedImage image) {
 	generateHistogram(image);
     }
 
@@ -57,16 +51,11 @@ public class Histogram {
      * More robust classifications to follow, especially to include white
      * and pink (white-red bleed through).
      */
-    private void generateHistogram(Subimage waldoSubimage) {
+    private void generateHistogram(BufferedImage wIm) {
 	float bitAmountf = 15.0f;
 
-	BufferedImage wim = waldoSubimage.getImage();
-	
-	BufferedImage waldoImage = deepCopy(wim);
-	
+	BufferedImage waldoImage = deepCopy(wIm);
 	BufferedImage writeImage = new BufferedImage(waldoImage.getWidth(), waldoImage.getHeight(), waldoImage.getType());
-	int[] loc = waldoSubimage.getLocation();
-	Subimage writeSubimage = new Subimage(writeImage, loc[0], loc[1]);
 
 	ColorCorrection colCorrector = new ColorCorrection();
 
@@ -85,19 +74,12 @@ public class Histogram {
 
 		// Separate the Red, Green and Blue values.
 		Color col = new Color(rgbVal);
-
-		Integer red = (Integer) col.getRed();
-		Integer blue = (Integer) col.getBlue();
-		Integer green = (Integer) col.getGreen();	      
+		col = colCorrector.make12Bit(col);
 		
-		float rP = (float) red/255.0f;
-		float gP = (float) green/255.0f;
-		float bP = (float) blue/255.0f;
-
-		red =  (int) (rP * bitAmountf);		
-		blue =  (int) (bP * bitAmountf);
-		green = (int) (gP * bitAmountf);
-				           
+		Integer red = col.getRed();
+		Integer green = col.getGreen();
+		Integer blue = col.getBlue();
+		
 		Integer rbDiff = red-blue;
 		Integer rgDiff = red-green;
 		Integer bgDiff = Math.abs(blue-green);
@@ -117,7 +99,7 @@ public class Histogram {
 		    waldoImage.setRGB(x,y,pixCol.getRGB());
 		    
 		    for(int i = x - 2; i <= x; i++){
-			if(i >= 0) {
+			if(i >= 0){
 			    for(int j = y - 2; j <= y; j++){
 				if (j >= 0) {
 				    Color col2 = new Color(waldoImage.getRGB(i,j));
@@ -134,11 +116,10 @@ public class Histogram {
 			    }
 			}   
 		    }
-		    
 		}		
 	    }
 	}
-	
+
 	for( int x = 0; x < writeImage.getWidth(); x++){
 	    for( int y = 0; y < writeImage.getHeight(); y++){
 		Color color = new Color(writeImage.getRGB(x,y));
@@ -147,10 +128,9 @@ public class Histogram {
 		}
 	    }
 	}
-	
+		
 	waldoConfidence /= waldoPixels;
 	
-	//writeSubimage.writeImage("WaldoHist.jpg");
-	//waldoSubimage.writeImage("test.jpg");
+	
     }
 }

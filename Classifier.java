@@ -41,15 +41,50 @@ public class Classifier {
 	}
 
 	System.out.println(numImages + " " + filter.size());
-	// Returned the filtered vector
+	
 	return filter;
     }
 
-    public boolean classifyImage(Subimage waldoImage) {
-	Histogram hist = new Histogram(waldoImage);
-	float conf = hist.getWaldoConfidence();
+    public Vector<Subimage> classifyByStandardDev(Vector<Subimage> subimages, float minSD, float maxSD) {
 	
-	return (Math.abs(conf-waldoConfidence)/waldoStandardErr) <= 2.0f;
+	if (minSD > maxSD) {
+	    minSD = maxSD;
+	    maxSD = minSD;
+	}
+
+	// A Vector holding only those images that belong to Waldo
+	Vector<Subimage> filter = new Vector<Subimage>();
+
+	final int numImages = subimages.size();
+
+	for(int i = 0; i < numImages; i++){
+	    
+	    Subimage sub = subimages.get(i);
+	    if(classifyImageByStandardDev(sub, minSD, maxSD)){
+		filter.add(sub);
+	    }
+	    
+	}
+
+	System.out.println(numImages + " " + filter.size());
+	
+	return filter;
+    }
+
+    public float getImageStandardDev(Subimage subimage){
+	float conf = subimage.getConfLevel();
+	
+	return Math.abs(conf - waldoConfidence) / waldoStandardErr;
+    }
+
+    public boolean classifyImageByStandardDev(Subimage waldoImage, Float minSD, Float maxSD){
+	float sd = getImageStandardDev(waldoImage);
+	return (sd >= minSD && sd <= maxSD); 
+    }
+
+    public boolean classifyImage(Subimage waldoImage) {
+	float sd = getImageStandardDev(waldoImage);
+	return (sd <= 3.0f);
     }
 
     public boolean setStandard(Vector<Subimage> waldoImages){
@@ -57,12 +92,12 @@ public class Classifier {
 
 	Vector<Float> means = new Vector<Float>();
 	for (int i = 0; i < waldoImages.size(); i++){
-	    Histogram hist = new Histogram(waldoImages.get(i));
-	    Float conf = hist.getWaldoConfidence();
+	    Float conf = waldoImages.get(i).getConfLevel();
 	    
 	    mean += conf;
 	    means.add(conf);
 	}
+
 	mean /= (float) waldoImages.size();
 	
 	waldoConfidence = mean;

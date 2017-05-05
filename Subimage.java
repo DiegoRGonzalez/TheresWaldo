@@ -10,7 +10,9 @@ public class Subimage {
 
     //Global variables
     private BufferedImage image;
-    
+    private Histogram hist;
+    private float confLevel;
+
     //x and y correspond to the coordinate of top left corner of the subimage
     //in the original image. We can get the rest of the pixels this subimage
     //covers in the original image from the height and width of image.
@@ -21,6 +23,8 @@ public class Subimage {
 	this.image = image;
 	this.x = x;
 	this.y = y;
+	this.hist = new Histogram(image);
+	this.confLevel = hist.getWaldoConfidence();
     }
     
     public BufferedImage getImage() {
@@ -29,6 +33,18 @@ public class Subimage {
 
     public int[] getLocation() {
 	return new int[]{x, y};
+    }
+
+    public int getX(){
+	return x;
+    }
+
+    public int getY(){
+	return y;
+    }
+
+    public float getConfLevel(){
+	return confLevel;
     }
 
     public int getWidth() {
@@ -47,5 +63,13 @@ public class Subimage {
 	} catch(IOException e) {
 	    return false;
 	}	
+    }
+
+    public void setConfLevel(float conf){
+	this.confLevel = hist.getWaldoConfidence();
+    }
+
+    public Histogram getHistogram(){
+	return hist;
     }
 }

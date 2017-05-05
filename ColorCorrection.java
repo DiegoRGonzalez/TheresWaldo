@@ -128,6 +128,24 @@ public class ColorCorrection {
 	return image;
     }
 
+    public Color make12Bit(Color col){
+
+	Integer r = (Integer) col.getRed();
+	Integer g = (Integer) col.getGreen();
+	Integer b = (Integer) col.getBlue();
+	
+	float rP = (float) r/255.0f;
+	float gP = (float) g/255.0f;
+	float bP = (float) b/255.0f;
+	
+	r = (int) (rP * 15.0f);		
+	g = (int) (gP * 15.0f);
+	b = (int) (bP * 15.0f);
+	
+	return new Color(r, g, b);
+	
+    }
+
     public static void main(String[] argv){
 	ColorCorrection correct = new ColorCorrection();
 	try {
