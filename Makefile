@@ -1,5 +1,5 @@
 default:
-	javac *.java
+	javac -cp "/usr/share/java/weka.jar" *.java
 
 clean:
 	$(RM) *.class
@@ -9,6 +9,9 @@ clean:
 
 run0:
 	java Main 5 /home/scratch/17jdr3/TestingImages/Waldo/* WW0.jpg
-
+	
 run2: 
 	java Main 5 /home/scratch/17jdr3/TestingImages/Waldo/* WW2.jpg
+
+runNet:
+	java -cp /usr/share/java/weka.jar: Training
