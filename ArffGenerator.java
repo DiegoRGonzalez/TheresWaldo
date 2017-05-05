@@ -36,35 +36,42 @@ public class ArffGenerator {
 	}
 	return data.substring(0,data.length()-1);
     }
+
+    public void iterateFolders(String path, PrintWriter out) {
+	File folder = new File(path);
+	String[] files = folder.list();
+	try {
+	    for(int i = 0; i < files.length; i++) {
+		String filename = files[i];
+		File file = new File(path + "/" + filename);
+		if(file.isDirectory()) {
+		    iterateFolders(path + "/" + filename, out);
+		} else {
+		    BufferedImage image = ImageIO.read(file);
+		    String data = imageToArff(image);
+		    data += (filename.toLowerCase().contains("waldo")) ? ",yes\n" : ",no\n";
+		    out.print(data);
+		}
+	    }
+	} catch(IOException e) {
+	    System.out.println("A problem occured.");
+	    return;
+	}
+    }
     
     public static void main(String[] args) {
 	ArffGenerator ag = new ArffGenerator();
 
-	if(args.length < 1) {
-	    System.out.println("Need to give a file name for .arff file");
+	if(args.length < 2) {
+	    System.out.println("Need to give a file name for .arff file and folder with test images");
 	    return;
 	}
 	try {
 	        PrintWriter out = new PrintWriter(args[0]);
 		out.print("@RELATION Waldo\n\n"+ag.generateAttributes()+"\n@DATA\n");
-		
-		Scanner in = new Scanner(System.in);
-		System.out.println("Give file of images to make an .arff file");
 		String foldername = args[1];
-		File folder = new File(foldername);
-		String[] files = folder.list();
-		try {
-		    for(int i = 0; i < files.length; i++) {
-			String filename = files[i];
-			BufferedImage image = ImageIO.read(new File(foldername + "/" + filename));
-			String data = ag.imageToArff(image);
-			data += (filename.toLowerCase().contains("waldo")) ? ",yes\n" : ",no\n";
-			out.print(data);
-		    }
-		    out.close();
-		} catch(IOException e) {
-		    System.out.println("Only images in the folder");
-		}
+		ag.iterateFolders(foldername, out);
+		out.close();
 	} catch(FileNotFoundException e) {
 	    System.out.println("Problem occured");
 	    return;
