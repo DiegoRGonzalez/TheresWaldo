@@ -1,7 +1,7 @@
 default:
 	javac -cp "/usr/share/java/weka.jar" *.java
 
-rmImages:
+ready:
 	$(RM) SD0To1/Subimage*.jpg
 	$(RM) SD1To2/Subimage*.jpg
 	$(RM) SD2To3/Subimage*.jpg
