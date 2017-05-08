@@ -31,6 +31,10 @@ public class Subimage {
 	return image;
     }
 
+    public void setImage(BufferedImage newImage){
+	this.image = newImage;
+    }
+
     public int[] getLocation() {
 	return new int[]{x, y};
     }
