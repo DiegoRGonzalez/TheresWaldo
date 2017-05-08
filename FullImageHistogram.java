@@ -19,8 +19,10 @@ import java.awt.image.ColorModel;
  * will most likely be there. 
  */
 
-public class Histogram {
+public class FullImageHistogram {
     
+    public FullImageHistogram() {}
+
     // copies a bufferedImage with no connection to the original 
     private static BufferedImage deepCopy(BufferedImage bi) {
 
@@ -34,24 +36,21 @@ public class Histogram {
 	return newImage;
     }
 
-    private float waldoConfidence = 0.0f;
-
-    public Histogram () {}    
-
-    public Histogram (BufferedImage image) {
-	generateHistogram(image);
+    public boolean isWhite(int red, int green, int blue){
+	Integer rbDiff = red-blue;
+	Integer rgDiff = red-green;
+	Integer bgDiff = Math.abs(blue-green);
+	return Math.abs(rbDiff) <= 3 && Math.abs(rgDiff) <= 3 && bgDiff <= 2;
     }
 
-    public float getWaldoConfidence(){
-	return waldoConfidence;
+    public boolean isRed(boolean wCheck, int red, int green, int blue){
+	Integer rbDiff = red-blue;
+	Integer rgDiff = red-green;
+	Integer bgDiff = Math.abs(blue-green);
+	return !wCheck && rbDiff >= 4 && rgDiff >= 4 && bgDiff <= 2;
     }
-    
-    /* Classify the image according to whether or not Waldo may be there
-     * Currently classifies based on how much red appears in the image.
-     * More robust classifications to follow, especially to include white
-     * and pink (white-red bleed through).
-     */
-    private void generateHistogram(BufferedImage wIm) {
+
+    public BufferedImage generateHistogram(BufferedImage wIm) {
 	float bitAmountf = 15.0f;
 
 	BufferedImage waldoImage = deepCopy(wIm);
@@ -61,9 +60,6 @@ public class Histogram {
 
 	waldoImage = colCorrector.normalize(waldoImage);
 	
-	// The number of pixels in the image to find frequencies of colors
-	int waldoPixels = waldoImage.getWidth() * waldoImage.getHeight();
-
 	for( int x = 0; x < waldoImage.getWidth(); x++){
 	    for( int y = 0; y < waldoImage.getHeight(); y++){
 		
@@ -78,27 +74,21 @@ public class Histogram {
 		Integer green = col.getGreen();
 		Integer blue = col.getBlue();
 		
-		Integer rbDiff = red-blue;
-		Integer rgDiff = red-green;
-		Integer bgDiff = Math.abs(blue-green);
-
-		boolean wCheck = Math.abs(rbDiff) <= 3 && Math.abs(rgDiff) <= 3 && bgDiff <= 2;
-		boolean rCheck = !wCheck && rbDiff >= 4 && rgDiff >= 4 && bgDiff <= 2;
+		boolean wCheck = isWhite(red, green, blue);
+		boolean rCheck = isRed(wCheck, red, green, blue);
 		
 		// Check red and white
 		if(!(wCheck || rCheck)){
-		    
 		    waldoImage.setRGB(x, y, Color.BLACK.getRGB());
-		   
 		} else {
 		    int maxChannel = 255;
 		    
 		    Color pixCol = (rCheck) ? new Color(maxChannel, 0, 0) : new Color(0, maxChannel, maxChannel);
 		    waldoImage.setRGB(x,y,pixCol.getRGB());
 		    
-		    for(int i = x - 2; i <= x; i++){
+		    for(int i = x - 4; i <= x; i++){
 			if(i >= 0){
-			    for(int j = y - 2; j <= y; j++){
+			    for(int j = y - 4; j <= y; j++){
 				if (j >= 0) {
 				    Color col2 = new Color(waldoImage.getRGB(i,j));
 				    
@@ -114,21 +104,12 @@ public class Histogram {
 			    }
 			}   
 		    }
-		}		
-	    }
-	}
-
-	for( int x = 0; x < writeImage.getWidth(); x++){
-	    for( int y = 0; y < writeImage.getHeight(); y++){
-		Color color = new Color(writeImage.getRGB(x,y));
-		if (!color.equals(Color.WHITE)){
-		    waldoConfidence += 1.0f;
 		}
 	    }
 	}
-		
-	waldoConfidence /= waldoPixels;
-	
+    
+	return writeImage;
 	
     }
+
 }
