@@ -21,19 +21,6 @@ import java.awt.image.ColorModel;
 
 public class Histogram {
     
-    // copies a bufferedImage with no connection to the original 
-    private static BufferedImage deepCopy(BufferedImage bi) {
-
-	BufferedImage newImage = new BufferedImage(bi.getWidth(), bi.getHeight(),bi.getType());
-	for (int x = 0; x < bi.getWidth(); x++){
-	    for(int y = 0; y < bi.getHeight(); y++){
-		newImage.setRGB(x,y,bi.getRGB(x,y));
-	    }
-	}
-
-	return newImage;
-    }
-
     private float waldoConfidence = 0.0f;
 
     public Histogram () {}    
@@ -53,8 +40,8 @@ public class Histogram {
      */
     private void generateHistogram(BufferedImage wIm) {
 	float bitAmountf = 15.0f;
-
-	BufferedImage waldoImage = deepCopy(wIm);
+	Util util = new Util();
+	BufferedImage waldoImage = util.deepCopy(wIm);
 	BufferedImage writeImage = new BufferedImage(waldoImage.getWidth(), waldoImage.getHeight(), waldoImage.getType());
 
 	ColorCorrection colCorrector = new ColorCorrection();

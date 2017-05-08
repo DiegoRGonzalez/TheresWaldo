@@ -46,6 +46,14 @@ public class Main {
 	    int[] window = ed.getSpliceSize(image);
 
 	    Vector<Subimage> subimages = theresWaldo.createSubimages(window[0],window[1]);
+
+	    Util util = new Util();
+	    util.scaleImages(subimages);
+
+	    for(int i = 0; i < subimages.size(); i++){
+		subimages[i].writeImage("test" + i + ".jpg");
+	    }
+
 	    
 	    subimages = classifier.classify(subimages);
 
