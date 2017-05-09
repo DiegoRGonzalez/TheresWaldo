@@ -83,26 +83,24 @@ public class FullImageHistogram {
 		} else {
 		    int maxChannel = 255;
 		    
-		    Color pixCol = (rCheck) ? new Color(maxChannel, 0, 0) : new Color(0, maxChannel, maxChannel);
+		    Color pixCol = (rCheck) ? new Color(maxChannel, 0, 0) : new Color(0, 0, maxChannel);
 		    waldoImage.setRGB(x,y,pixCol.getRGB());
 		    
-		    for(int i = x - 4; i <= x; i++){
-			if(i >= 0){
-			    for(int j = y - 4; j <= y; j++){
-				if (j >= 0) {
-				    Color col2 = new Color(waldoImage.getRGB(i,j));
-				    
-				    if (col2.getRGB() != Color.BLACK.getRGB()) {
-					Color iterRGB = new Color(waldoImage.getRGB(i,j));
+		    Integer addProb = maxChannel/16;
 
-					if(!col2.equals(pixCol) || iterRGB.equals(Color.WHITE)) { 
-					    writeImage.setRGB(x, y, Color.WHITE.getRGB());
-					    writeImage.setRGB(i, j, Color.WHITE.getRGB());
-					}
-				    }
+		    for(int i = x - 4; i <= x && i >= 0; i++){
+			for(int j = y - 4; j <= y && j >= 0; j++){
+			    Color col2 = new Color(waldoImage.getRGB(i,j));
+				
+			    if (col2.getRGB() != Color.BLACK.getRGB()) {
+				if(!col2.equals(pixCol)) { 
+				    Integer g = col2.getGreen() + addProb;
+				    Color newCol = new Color(g, g, g);
+				    writeImage.setRGB(x, y, newCol.getRGB());
+				    writeImage.setRGB(i, j, newCol.getRGB());
 				}
 			    }
-			}   
+			}
 		    }
 		}
 	    }

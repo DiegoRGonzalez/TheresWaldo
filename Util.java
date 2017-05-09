@@ -17,7 +17,7 @@ public class Util {
     public Util() { }
 
     // copies a bufferedImage with no connection to the original 
-    public BufferedImage deepCopy(BufferedImage bi) {
+    public static BufferedImage deepCopy(BufferedImage bi) {
 
 	BufferedImage newImage = new BufferedImage(bi.getWidth(), bi.getHeight(),bi.getType());
 	for (int x = 0; x < bi.getWidth(); x++){
@@ -31,7 +31,7 @@ public class Util {
 
     
     //Returns an int array with the width and height of a subimage size
-    public void scaleImages(Vector<Subimage> images){
+    public static void scaleImages(Vector<Subimage> images){
 	final int numImages = images.size();
 	Vector<Subimage> scaledImages = new Vector<Subimage>(numImages);
 

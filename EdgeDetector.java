@@ -21,8 +21,8 @@ public class EdgeDetector {
     public int[] getSpliceSize(BufferedImage image){
 	ArrayList<Integer> widthList = new ArrayList<Integer>();
 	ArrayList<Integer> heightList= new ArrayList<Integer>();
-	Util util = new Util();
-	BufferedImage result = util.deepCopy(image);
+	
+	BufferedImage result = Util.deepCopy(image);
 	int threshold = 150;
 
 	// To be used for edge detection
@@ -135,7 +135,7 @@ public class EdgeDetector {
 	ArrayList widthList = new ArrayList();
 	ArrayList heightList= new ArrayList();
 
-	BufferedImage result = deepCopy(image);
+	BufferedImage result = Util.deepCopy(image);
 	
 	int threshold = 150;
 	// To be used for edge detection
