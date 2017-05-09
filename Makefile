@@ -19,10 +19,10 @@ run1:
 	java Main 5 /home/scratch/17jdr3/TestingImages/Waldo/* WW1.jpg
 
 run2: 
-	java Main 5 /home/scratch/17jdr3/TestingImages/Waldo/* WW2.jpg
+	java Main 5 /home/scratch/17jcf1/TestingImages/Waldo/* WW2.jpg
 
 run3:
-	java Main 5 /home/scratch/17jdr3/TestingImages/Waldo/* WW3.jpg
+	java Main 5 /home/scratch/17jcf1/TestingImages/Waldo/* WW3.jpg
 
 runNet:
 	java -cp /usr/share/java/weka.jar: Trainer

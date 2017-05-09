@@ -7,53 +7,101 @@ import weka.classifiers.functions.MultilayerPerceptron;
 
 public class Trainer {
 
+    private MultilayerPerceptron mlp;
+    private Instances train;
+    private Instances test;
+
     public Trainer() {}
-    /*
+    
     public void saveNet(String path) {
-	Debug.saveToFile(path, mlp);
+	try{
+	    weka.core.SerializationHelper.write(path, mlp);
+	} catch(Exception ex) {
+	    ex.printStackTrace();
+	}
     }
 
-    public MultilayerPerceptron reloadNet(String path) {
-	mlp = new MultilayerPerceptron();
-	mlp.setModelFile(new File(path));
+    public void reloadNet(String path) {
+	try {
+	    mlp = (MultilayerPerceptron) weka.core.SerializationHelper.read(path);
+    	} catch(Exception ex) {
+	    System.out.println("Error");
+	    ex.printStackTrace();
+	}
+
+	System.out.println("HERE "+(mlp==null));
     }
-    */
-    public MultilayerPerceptron createNet(String training_set, String testing_set) {
-	MultilayerPerceptron mlp = new MultilayerPerceptron();
-	try{
+
+    public void trainNet(String training_set) {
+	try {
 	    FileReader trainreader = new FileReader(training_set);
-	    FileReader testreader = new FileReader(testing_set);
-	    
-	    Instances train = new Instances(trainreader);
-	    Instances test = new Instances(testreader);
+	    train = new Instances(trainreader);
 	    train.setClassIndex(train.numAttributes() - 1);
-	    test.setClassIndex(test.numAttributes() - 1);
-	    
-	    mlp.setOptions(Utils.splitOptions("-L 0.3 -M 0.2 -N 500 -V 0 -S 0 -E 20 -H 4"));
 	    mlp.buildClassifier(train);
+	    trainreader.close();
+	} catch(Exception ex) {
+	    ex.printStackTrace();
+	}
+    }
+
+    public void testNet(String testing_set) {
+	try{
+	    FileReader testreader = new FileReader(testing_set);
+	    test = new Instances(testreader);
+	    test.setClassIndex(test.numAttributes() - 1);
 	    
 	    Evaluation eval = new Evaluation(train);
 	    eval.evaluateModel(mlp, test);
 	    System.out.println(eval.toSummaryString("\nResults\n======\n", false));
-	    trainreader.close();
 	    testreader.close();
 	} catch(Exception ex){
 	    ex.printStackTrace();            
 	}
-	return mlp;
-    } 
+    }
     
+    public void createNet() {
+	try {
+	    mlp = new MultilayerPerceptron();
+	    mlp.setOptions(Utils.splitOptions("-L 0.3 -M 0.2 -N 500 -V 0 -S 0 -E 20 -H 4"));
+	} catch(Exception ex) {
+	    ex.printStackTrace();
+	}
+    }
+
     public static void main(String args[]) {	
 	Trainer t = new Trainer();
-	if(args.length < 2 || args.length > 3) {
-	    System.out.println("Need to pass in Training arff and Testing arff files.\nCan also add an extra file to save the multilayer perceptron to.");
-	    return;
-	} else {
-	    t.createNet(args[0], args[1]);
-	    //	    if(args.length == 3) {
-	    //	t.saveNet(args[2]);
-	    //}
+	String training_set = "";
+	String testing_set = "";
+	String savefile = "";
+	boolean load = false;
+
+	for(int i = 0; (i + 1) < args.length; i++) {
+	    String s = args[i++];
+	    if(s.equals("-tr")) {
+		training_set = args[i];
+	    } else if(s.equals("-te")) {
+		testing_set = args[i];
+	    } else if(s.equals("-s")) {
+		savefile = args[i];
+	    } else if(s.equals("-l")) {
+		load = true;
+		t.reloadNet(args[i]);
+	    }
 	}
-	return;
+
+	System.out.println(training_set+" "+testing_set+" "+savefile);
+
+	if(!load) {
+	    t.createNet();
+	}
+	if(!training_set.equals("")) {
+	    t.trainNet(training_set);
+	}
+	if(!testing_set.equals("")) {
+	    t.testNet(testing_set);
+	}
+	if(!savefile.equals("")) {
+	    t.saveNet(savefile);
+	}
     } 
 }

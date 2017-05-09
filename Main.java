@@ -50,9 +50,9 @@ public class Main {
 	    Util util = new Util();
 	    util.scaleImages(subimages);
 
-	    for(i = 0; i < subimages.size(); i++){
+	    /*for(i = 0; i < subimages.size(); i++){
 		subimages.get(i).writeImage("test" + i + ".jpg");
-	    }
+		}*/
 
 	    
 	    subimages = classifier.classify(subimages);
