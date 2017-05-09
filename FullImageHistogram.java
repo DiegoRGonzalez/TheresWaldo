@@ -93,26 +93,154 @@ public class FullImageHistogram {
           int maxChannel = 255;
           Color curColor = new Color(waldoImage.getRGB(x,y));
 
-          Integer sameCol = 0;
+          Integer sameCol = 1;
           Integer otherCol = 0;
+          float pixNum = 0.0f;
 
-          for(int i = x - 4; i <= x && i >= 0; i++){
-            for(int j = y - 4; j <= y && j >= 0; j++){
+          for(int i = x - 1; i <= (x+1) && i >= 0 && i < waldoImage.getWidth(); i++){
+            for(int j = y - 1; j <= (y+1) && j >= 0 && j < waldoImage.getHeight(); j++){
+              pixNum += 1.0f;
               Color col2 = new Color(waldoImage.getRGB(i,j));
 
-              if (col2.getRGB() != Color.BLACK.getRGB() && curColor.getRGB() != col2.getRGB()) sameCol += 1;
+              if (col2.getRGB() != Color.BLACK.getRGB() && curColor.getRGB() == col2.getRGB()) sameCol += 1;
               else if(col2.getRGB() != Color.BLACK.getRGB()) otherCol += 1;
             }
           }
 
           Integer prob = 0;
-          if(curColor.equals(Color.RED) && otherCol != 0) {
-             prob = sameCol * 30 - otherCol * 10 + (int)((float) sameCol/(float)otherCol * 15.0f);
-          } else if(otherCol != 0){
-             prob = otherCol * 30 - sameCol * 10 + (int)((float) otherCol/(float)sameCol * 15.0f);
+          if(curColor.equals(Color.RED) && otherCol > sameCol/4) {
+            float redProb = (float) sameCol;
+            redProb /= pixNum;
+            redProb *= 75.0f;
+            float whiteProb = (float) otherCol;
+            whiteProb /= pixNum;
+            whiteProb *= 25.0f;
+
+             prob = (int) (redProb + whiteProb);
+          } else if(otherCol > 0 && sameCol > otherCol/4){
+            float redProb = (float) otherCol;
+            redProb /= pixNum;
+            redProb *= 75.0f;
+            float whiteProb = (float) sameCol;
+            whiteProb /= pixNum;
+            whiteProb *= 25.0f;
+
+             prob = (int) (redProb + whiteProb);
           }
 
+          assert(prob >= 0 && prob <= 100);
+          prob = (prob < 0) ? 0 : prob;
           Color newCol = new Color(prob, prob, prob);
+          writeImage.setRGB(x,y,newCol.getRGB());
+        }
+      }
+
+      Subimage.writeImage("Here", writeImage);
+
+      for( int x = 0; x < waldoImage.getWidth(); x++) {
+        for( int y = 0; y < waldoImage.getHeight(); y++) {
+          int maxChannel = 255;
+          int sameCol = 0;
+          int otherCol = 0;
+
+          Color curColor = new Color(waldoImage.getRGB(x,y));
+          float pixNum = 0.0f;
+          for(int i = x - 2; i <= (x+2) && i >= 0 && i < waldoImage.getWidth(); i++){
+            for(int j = y - 2; j <= (y+2) && j >= 0 && j < waldoImage.getHeight(); j++){
+              pixNum += 1.0f;
+              Color col2 = new Color(waldoImage.getRGB(i,j));
+
+              Color probCol = new Color(writeImage.getRGB(i,j));
+              Integer prevProb = probCol.getRed();
+              if (prevProb >= 25 && col2.getRGB() != Color.BLACK.getRGB() && curColor.getRGB() == col2.getRGB()) {
+                sameCol += 1;
+              }
+              else if(prevProb >= 25 && col2.getRGB() != Color.BLACK.getRGB()) {
+                otherCol += 1;
+              }
+            }
+          }
+
+          Integer prob = 0;
+          if(curColor.equals(Color.RED) && otherCol > sameCol/4) {
+            float redProb = (float) sameCol;
+            redProb /= pixNum;
+            redProb *= 75.0f;
+            float whiteProb = (float) otherCol;
+            whiteProb /= pixNum;
+            whiteProb *= 25.0f;
+             prob = (int) (redProb + whiteProb);
+          } else if(otherCol != 0 && sameCol > 1 && sameCol > otherCol/4){
+            float redProb = (float) otherCol;
+            redProb /= pixNum;
+            redProb *= 75.0f;
+            float whiteProb = (float) sameCol;
+            whiteProb /= pixNum;
+            whiteProb *= 25.0f;
+             prob = (int) (redProb + whiteProb);
+          }
+
+          prob = (prob < 0) ? 0 : prob;
+
+          Color newCol = new Color(prob, prob, prob);
+
+          writeImage.setRGB(x,y,newCol.getRGB());
+        }
+      }
+
+            Subimage.writeImage("Here2", writeImage);
+
+      for( int x = 0; x < waldoImage.getWidth(); x++) {
+        for( int y = 0; y < waldoImage.getHeight(); y++) {
+          int maxChannel = 255;
+          int sameCol = 0;
+          int otherCol = 0;
+
+          Color curColor = new Color(waldoImage.getRGB(x,y));
+          float pixNum = 0.0f;
+          for(int i = x - 4; i <= (x+4) && i >= 0 && i < waldoImage.getWidth(); i++){
+            for(int j = y - 4; j <= (y+4) && j >= 0 && j < waldoImage.getHeight(); j++){
+              pixNum += 1.0f;
+              Color col2 = new Color(waldoImage.getRGB(i,j));
+
+              Color probCol = new Color(writeImage.getRGB(i,j));
+              Integer prevProb = probCol.getRed();
+              if (prevProb >= 30 && col2.getRGB() != Color.BLACK.getRGB() && curColor.getRGB() == col2.getRGB()) {
+                sameCol += 1;
+              }
+              else if(prevProb >= 30 && col2.getRGB() != Color.BLACK.getRGB()) {
+                otherCol += 1;
+              }
+            }
+          }
+
+          Integer prob = 0;
+          if(curColor.equals(Color.RED) && otherCol > sameCol/4) {
+            float redProb = (float) sameCol;
+            redProb /= pixNum;
+            redProb *= 75.0f;
+            float whiteProb = (float) otherCol;
+            whiteProb /= pixNum;
+            whiteProb *= 25.0f;
+
+             prob = (int) (redProb + whiteProb);
+          } else if(otherCol != 0 && sameCol > 1 && sameCol > otherCol/4){
+            float redProb = (float) otherCol;
+            redProb /= pixNum;
+            redProb *= 75.0f;
+            float whiteProb = (float) sameCol;
+            whiteProb /= pixNum;
+            whiteProb *= 25.0f;
+
+             prob = (int) (redProb + whiteProb);
+          }
+
+          Integer writeProb = (int) ((float) prob/100.0f * 255.0f);
+
+
+          writeProb = (writeProb > 254) ? 254 : writeProb;
+          writeProb = (writeProb < 0) ? 0 : writeProb;
+          Color newCol = new Color(writeProb, writeProb, writeProb);
           writeImage.setRGB(x,y,newCol.getRGB());
         }
       }

@@ -19,7 +19,7 @@ run0:
 run1:
 	java Main 5 Waldo/* WW1.jpg
 
-run2: 
+run2:
 	java Main 5 Waldo/* WW2.jpg
 
 run3:
@@ -27,6 +27,9 @@ run3:
 
 run4:
 	java Main 5 Waldo/* WW4.jpg
+
+runP:
+	java Main 5 Waldo/* WWP.jpg
 
 runNet:
 	java -cp /usr/share/java/weka.jar: Trainer

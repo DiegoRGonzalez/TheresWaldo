@@ -8,76 +8,76 @@ import java.io.File;
 //a small portion of the original image
 public class Subimage {
 
-    //Global variables
-    private BufferedImage image;
-    private Histogram hist;
-    private float confLevel;
+  //Global variables
+  private BufferedImage image;
+  private Histogram hist;
+  private float confLevel;
 
-    //x and y correspond to the coordinate of top left corner of the subimage
-    //in the original image. We can get the rest of the pixels this subimage
-    //covers in the original image from the height and width of image.
-    private int x;
-    private int y;
+  //x and y correspond to the coordinate of top left corner of the subimage
+  //in the original image. We can get the rest of the pixels this subimage
+  //covers in the original image from the height and width of image.
+  private int x;
+  private int y;
 
-    public Subimage(BufferedImage image, int x, int y) {
-	this.image = image;
-	this.x = x;
-	this.y = y;
-	this.hist = new Histogram(image);
-	this.confLevel = hist.getWaldoConfidence();
-    }
-    
-    public BufferedImage getImage() {
-	return image;
-    }
+  public Subimage(BufferedImage image, int x, int y) {
+    this.image = image;
+    this.x = x;
+    this.y = y;
+    this.hist = new Histogram(image);
+    this.confLevel = hist.getWaldoConfidence();
+  }
 
-    public void setImage(BufferedImage newImage){
-	this.image = newImage;
-    }
+  public BufferedImage getImage() {
+    return image;
+  }
 
-    public int[] getLocation() {
-	return new int[]{x, y};
-    }
+  public void setImage(BufferedImage newImage){
+    this.image = newImage;
+  }
 
-    public int getX(){
-	return x;
-    }
+  public int[] getLocation() {
+    return new int[]{x, y};
+  }
 
-    public int getY(){
-	return y;
-    }
+  public int getX(){
+    return x;
+  }
 
-    public float getConfLevel(){
-	return confLevel;
-    }
+  public int getY(){
+    return y;
+  }
 
-    public int getWidth() {
-	return image.getWidth();
-    }
+  public float getConfLevel(){
+    return confLevel;
+  }
 
-    public int getHeight() {
-	return image.getHeight();
-    }
+  public int getWidth() {
+    return image.getWidth();
+  }
 
-    public boolean writeImage(String path){
-	return writeImage(path, getImage());
-    }
+  public int getHeight() {
+    return image.getHeight();
+  }
 
-    public static boolean writeImage(String path, BufferedImage image){
-	try{
-	    File outputfile = new File(path);
-	    ImageIO.write(image, "jpg", outputfile);
-	    return true;
-	} catch(IOException e) {
-	    return false;
-	}	
-    }
+  public boolean writeImage(String path){
+    return writeImage(path, getImage());
+  }
 
-    public void setConfLevel(float conf){
-	this.confLevel = hist.getWaldoConfidence();
+  public static boolean writeImage(String path, BufferedImage image){
+    try{
+      File outputfile = new File(path);
+      ImageIO.write(image, "jpg", outputfile);
+      return true;
+    } catch(IOException e) {
+      return false;
     }
+  }
 
-    public Histogram getHistogram(){
-	return hist;
-    }
+  public void setConfLevel(float conf){
+    this.confLevel = hist.getWaldoConfidence();
+  }
+
+  public Histogram getHistogram(){
+    return hist;
+  }
 }
