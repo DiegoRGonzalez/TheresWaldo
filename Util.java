@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.awt.image.WritableRaster;
 import java.awt.image.ColorModel;
 import java.awt.Graphics;
+import java.util.Vector;
 
 public class Util {
 
@@ -31,19 +32,19 @@ public class Util {
 
     
     //Returns an int array with the width and height of a subimage size
-    public void scaleImages(Vector<SubImage> images){
+    public void scaleImages(Vector<Subimage> images){
 	final int numImages = images.size();
-	Vector<SubImage> scaledImages = new Vector<SubImage>(numImages);
+	Vector<Subimage> scaledImages = new Vector<Subimage>(numImages);
 
 	for(int i = 0; i < numImages; i++){
-	    BufferedImage before = images[i].getImage();
+	    BufferedImage before = images.get(i).getImage();
 	    BufferedImage newImage = new BufferedImage(25,25,BufferedImage.TYPE_INT_RGB);
 
 	    Graphics g = newImage.createGraphics();
 	    g.drawImage(before,0,0,25,25,null);
 	    g.dispose();
 		
-	    images[i].setImage(newImage);
+	    images.get(i).setImage(newImage);
 	}
 
 	

@@ -49,12 +49,7 @@ public class Main {
 
 	    Util util = new Util();
 	    util.scaleImages(subimages);
-
-	    for(int i = 0; i < subimages.size(); i++){
-		subimages[i].writeImage("test" + i + ".jpg");
-	    }
-
-	    
+    
 	    subimages = classifier.classify(subimages);
 
 	    Vector<Subimage> sd0To1 = classifier.classifyByStandardDev(subimages, 0.0f, 1.0f);
