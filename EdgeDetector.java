@@ -15,21 +15,14 @@ public class EdgeDetector {
 
     public EdgeDetector() { }
     
-    // copies a bufferedImage with no connection to the original 
-    static BufferedImage deepCopy(BufferedImage bi) {
-	
-	ColorModel cm = bi.getColorModel();
-	boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
-	WritableRaster raster = bi.copyData(null);
-	return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
-	
-    }
+    
     
     //Returns an int array with the width and height of a subimage size
     public int[] getSpliceSize(BufferedImage image){
-	ArrayList widthList = new ArrayList();
-	ArrayList heightList= new ArrayList();
-	BufferedImage result = deepCopy(image);
+	ArrayList<Integer> widthList = new ArrayList<Integer>();
+	ArrayList<Integer> heightList= new ArrayList<Integer>();
+	Util util = new Util();
+	BufferedImage result = util.deepCopy(image);
 	int threshold = 150;
 	// To be used for edge detection
 	int borderSum1 = -1;
@@ -130,11 +123,12 @@ public class EdgeDetector {
 	int height = (int)heightList.get((int)Math.floor(percentage*heightList.size()));
 	
 	//This is to ensure a square subimage size
-	int size = Math.max(height,width);
+	int size = (height+width)/2;
+	size = Math.max(25, size*2);
 
 	//Double the size of the person to make sure we get people inside our subimages
 	//return new int[]{2*size,2*size};
-	return new int[]{25, 25};
+	return new int[]{size, size};
 
     }
 
