@@ -10,72 +10,62 @@ import java.util.PriorityQueue;
 
 public class Main {
 
-    private static void usage(){
-	System.out.println("ERROR");
-	System.out.println("java Main #WaldoImages WaldoImageFolderFiles WheresWaldoImage");
-	System.exit(1);
+  private static void usage(){
+    System.out.println("ERROR");
+    System.out.println("java Main #WaldoImages WaldoImageFolderFiles WheresWaldoImage");
+    System.exit(1);
+  }
+
+  //Main method of our whole program
+  public static void main(String[] argv){
+    Scanner scan = new Scanner(System.in);
+    EdgeDetector ed = new EdgeDetector();
+    Classifier classifier = new Classifier();
+    ColorCorrection corrector = new ColorCorrection();
+    FullImageHistogram fullImHist = new FullImageHistogram();
+    int argLen = argv.length;
+
+    try{
+      int num = Integer.parseInt(argv[0]);
+
+      int i = 1;
+      Vector<Subimage> waldoImages = new Vector<Subimage>();
+      for(; i <= num; i++){
+        BufferedImage im = ImageIO.read(new File(argv[i]));
+        Subimage sub = new Subimage(im, 0, 0);
+        waldoImages.add(sub);
+
+      }
+      classifier.setStandard(waldoImages);
+
+      BufferedImage image = ImageIO.read(new File(argv[i]));
+      
+      Subimage.writeImage("WWWFullHist", fullImHist.generateHistogram(image));
+      image = corrector.normalize(image);
+
+      TheresWaldo theresWaldo = new TheresWaldo(image);
+
+      int[] window = ed.getSpliceSize(image);
+
+      Vector<Subimage> subimages = theresWaldo.createSubimages(window[0],window[1]);
+
+      Util.scaleImages(subimages);
+
+      subimages = classifier.classify(subimages);
+
+      Vector<Subimage> sd0To1 = classifier.classifyByStandardDev(subimages, 0.0f, 1.0f);
+      Vector<Subimage> sd1To2 = classifier.classifyByStandardDev(subimages, 1.0f, 2.0f);
+      Vector<Subimage> sd2To3 = classifier.classifyByStandardDev(subimages, 2.0f, 3.0f);
+
+      theresWaldo.writeSubimages(sd0To1, "SD0To1/Subimage");
+      theresWaldo.writeSubimages(sd1To2, "SD1To2/Subimage");
+      theresWaldo.writeSubimages(sd2To3, "SD2To3/Subimage");
+
+
+    } catch (Exception e){
+      System.out.println(e);
+      e.printStackTrace();
+      usage();
     }
-    
-    //Main method of our whole program
-    public static void main(String[] argv){
-	Scanner scan = new Scanner(System.in);
-	EdgeDetector ed = new EdgeDetector();
-	Classifier classifier = new Classifier();
-	ColorCorrection corrector = new ColorCorrection();
-	FullImageHistogram fullImHist = new FullImageHistogram();
-	int argLen = argv.length;
-
-	try{
-	    int num = Integer.parseInt(argv[0]);
-	
-	    int i = 1;
-	    Vector<Subimage> waldoImages = new Vector<Subimage>();
-	    for(; i <= num; i++){
-		BufferedImage im = ImageIO.read(new File(argv[i]));
-		Subimage sub = new Subimage(im, 0, 0);
-		waldoImages.add(sub);
-		
-	    }
-	    classifier.setStandard(waldoImages);
-
-	    BufferedImage image = ImageIO.read(new File(argv[i]));
-	    
-	    BufferedImage im = fullImHist.generateRedImage(image);
-	    Subimage.writeImage("redIm", im);
-
-	    BufferedImage im2 = fullImHist.generateWhiteImage(image);
-	    Subimage.writeImage("whiteIm", im2);
-
-	    BufferedImage histIm = fullImHist.generateHistogram(image);
-	    Subimage.writeImage("WWWFullHist", histIm);
-	    image = corrector.normalize(image);
-
-	    TheresWaldo theresWaldo = new TheresWaldo(image, histIm);
-
-	    int[] window = ed.getSpliceSize(image);
-
-	    Vector<Subimage> subimages = theresWaldo.createSubimages(window[0],window[1]);
-
-	    theresWaldo.writeSubimages(subimages, "AllImages/Subimage");
-
-	    Util util = new Util();
-	    util.scaleImages(subimages);
-
-	    subimages = classifier.classify(subimages);
-
-	    Vector<Subimage> sd0To1 = classifier.classifyByStandardDev(subimages, 0.0f, 1.0f);
-	    Vector<Subimage> sd1To2 = classifier.classifyByStandardDev(subimages, 1.0f, 2.0f);
-	    Vector<Subimage> sd2To3 = classifier.classifyByStandardDev(subimages, 2.0f, 3.0f);
-	    
-	    theresWaldo.writeSubimages(sd0To1, "SD0To1/Subimage");
-	    theresWaldo.writeSubimages(sd1To2, "SD1To2/Subimage");
-	    theresWaldo.writeSubimages(sd2To3, "SD2To3/Subimage");
-	    
-	    
-	} catch (Exception e){
-	    System.out.println(e);
-	    e.printStackTrace();
-	    usage();
-	}
-    }
+  }
 }
