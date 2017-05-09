@@ -7,10 +7,25 @@ import javax.imageio.ImageIO;
 import java.util.Scanner;
 import java.io.PrintWriter;
 import java.awt.Color;
+import weka.core.Instance;
 
 public class ArffGenerator {
 
     public ArffGenerator() {}
+
+    public Instance createInstance(BufferedImage image) {
+	Instance inst = new Instance(image.getWidth() * image.getHeight());
+	int i = 0;
+	for(int x = 0; x < image.getWidth(); x++) {
+	    for(int y = 0; y < image.getHeight(); y++) {
+		Color color = new Color(image.getRGB(x, y));
+		inst.setValue(i++, color.getRed());
+		inst.setValue(i++, color.getGreen());
+		inst.setValue(i++, color.getBlue());
+	    }
+	}
+	return inst;
+    }
     
     private String generateAttributes() {
 	String attr = "";

@@ -45,9 +45,5 @@ public class Util {
 		
 	    images.get(i).setImage(newImage);
 	}
-
-	
     }
-
-
 }
