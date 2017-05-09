@@ -50,8 +50,8 @@ public class Main {
 	    Util util = new Util();
 	    util.scaleImages(subimages);
 
-	    for(int i = 0; i < subimages.size(); i++){
-		subimages[i].writeImage("test" + i + ".jpg");
+	    for(i = 0; i < subimages.size(); i++){
+		subimages.get(i).writeImage("test" + i + ".jpg");
 	    }
 
 	    
