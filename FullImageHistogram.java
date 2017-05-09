@@ -86,12 +86,12 @@ public class FullImageHistogram {
 		    Color pixCol = (rCheck) ? new Color(maxChannel, 0, 0) : new Color(0, 0, maxChannel);
 		    waldoImage.setRGB(x,y,pixCol.getRGB());
 		    
-		    Integer addProb = maxChannel/16;
+		    Integer addProb = maxChannel/4;
 
 		    for(int i = x - 4; i <= x && i >= 0; i++){
 			for(int j = y - 4; j <= y && j >= 0; j++){
 			    Color col2 = new Color(waldoImage.getRGB(i,j));
-				
+			    
 			    if (col2.getRGB() != Color.BLACK.getRGB()) {
 				if(!col2.equals(pixCol)) { 
 				    Integer g = col2.getGreen() + addProb;
