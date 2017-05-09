@@ -14,7 +14,7 @@ public class ArffGenerator {
     public ArffGenerator() {}
 
     public Instance createInstance(BufferedImage image) {
-	Instance inst = new Instance(image.getWidth() * image.getHeight());
+	Instance inst = new Instance(3 * (image.getWidth() * image.getHeight()));
 	int i = 0;
 	for(int x = 0; x < image.getWidth(); x++) {
 	    for(int y = 0; y < image.getHeight(); y++) {

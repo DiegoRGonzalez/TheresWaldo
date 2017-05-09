@@ -4,14 +4,16 @@ import weka.core.Instances;
 import weka.classifiers.Evaluation;
 import weka.classifiers.*;
 import weka.classifiers.functions.MultilayerPerceptron;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
 
-public class Trainer {
+public class NeuralNetCreater {
 
     private MultilayerPerceptron mlp;
     private Instances train;
     private Instances test;
 
-    public Trainer() {}
+    public NeuralNetCreator() {}
     
     public void saveNet(String path) {
 	try{
@@ -25,11 +27,8 @@ public class Trainer {
 	try {
 	    mlp = (MultilayerPerceptron) weka.core.SerializationHelper.read(path);
     	} catch(Exception ex) {
-	    System.out.println("Error");
 	    ex.printStackTrace();
 	}
-
-	System.out.println("HERE "+(mlp==null));
     }
 
     public void trainNet(String training_set) {
@@ -58,21 +57,34 @@ public class Trainer {
 	    ex.printStackTrace();            
 	}
     }
+
+    public void classify(BufferedImage image) {
+	try {
+	    ArffGenerator ag = new ArffGenerator();
+	    Instance inst = ag.createInstance(image);
+	    double[] result = mlp.distributionForInstance(inst);
+	    System.out.println("Yes: "+result[0]);
+	    System.out.println("No: "+result[1]);
+	} catch(Exception ex) {
+	    ex.printStackTrace();
+	}
+    }
     
     public void createNet() {
 	try {
 	    mlp = new MultilayerPerceptron();
-	    mlp.setOptions(Utils.splitOptions("-L 0.3 -M 0.2 -N 500 -V 0 -S 0 -E 20 -H 4"));
+	    mlp.setOptions(Utils.splitOptions("-L 0.3 -M 0.2 -N 500 -V 100 -S 0 -E 1 -H 20"));
 	} catch(Exception ex) {
 	    ex.printStackTrace();
 	}
     }
 
     public static void main(String args[]) {	
-	Trainer t = new Trainer();
+	NeuralNetCreater t = new NeuralNetCreater();
 	String training_set = "";
 	String testing_set = "";
 	String savefile = "";
+	BufferedImage image = null;
 	boolean load = false;
 
 	for(int i = 0; (i + 1) < args.length; i++) {
@@ -86,10 +98,17 @@ public class Trainer {
 	    } else if(s.equals("-l")) {
 		load = true;
 		t.reloadNet(args[i]);
+	    } else if(s.equals("-c")) {
+		try {
+		    image = ImageIO.read(new File(args[i]));
+		} catch(Exception ex) {
+		    ex.printStackTrace();
+		}
+	    } else {
+		System.out.println("Incorrect parameters");
+		return;
 	    }
 	}
-
-	System.out.println(training_set+" "+testing_set+" "+savefile);
 
 	if(!load) {
 	    t.createNet();
@@ -99,6 +118,9 @@ public class Trainer {
 	}
 	if(!testing_set.equals("")) {
 	    t.testNet(testing_set);
+	}
+	if(image != null) {
+	    t.classify(image);
 	}
 	if(!savefile.equals("")) {
 	    t.saveNet(savefile);
