@@ -49,6 +49,7 @@ public class Main {
 
 	    Util util = new Util();
 	    util.scaleImages(subimages);
+
 	    subimages = classifier.classify(subimages);
 
 	    Vector<Subimage> sd0To1 = classifier.classifyByStandardDev(subimages, 0.0f, 1.0f);
