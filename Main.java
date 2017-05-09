@@ -39,15 +39,24 @@ public class Main {
 	    classifier.setStandard(waldoImages);
 
 	    BufferedImage image = ImageIO.read(new File(argv[i]));
+	    
+	    BufferedImage im = fullImHist.generateRedImage(image);
+	    Subimage.writeImage("redIm", im);
 
-	    Subimage.writeImage("WWWFullHist", fullImHist.generateHistogram(image));
+	    BufferedImage im2 = fullImHist.generateWhiteImage(image);
+	    Subimage.writeImage("whiteIm", im2);
+
+	    BufferedImage histIm = fullImHist.generateHistogram(image);
+	    Subimage.writeImage("WWWFullHist", histIm);
 	    image = corrector.normalize(image);
 
-	    TheresWaldo theresWaldo = new TheresWaldo(image);
+	    TheresWaldo theresWaldo = new TheresWaldo(image, histIm);
 
 	    int[] window = ed.getSpliceSize(image);
 
 	    Vector<Subimage> subimages = theresWaldo.createSubimages(window[0],window[1]);
+
+	    theresWaldo.writeSubimages(subimages, "AllImages/Subimage");
 
 	    Util util = new Util();
 	    util.scaleImages(subimages);

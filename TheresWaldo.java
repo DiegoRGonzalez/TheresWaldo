@@ -5,15 +5,35 @@ import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.util.Vector;
 
+import java.awt.Color;
+
 //Currently, a class that does the creation and writing of subimages of the original image
 public class TheresWaldo {
     
     //Global variables
     private BufferedImage image;
-
+    private BufferedImage histImage;
+    
     //Constructor
-    public TheresWaldo(BufferedImage image) {
+    public TheresWaldo(BufferedImage image, BufferedImage histImage) {
 	this.image = image;
+	this.histImage = histImage;
+    }
+    
+    private Boolean possibleWaldo(BufferedImage image, int x, int y, int width, int height){
+	BufferedImage hist = histImage.getSubimage(x, y, width, height);
+	float prop = 0.0f;
+	for(int i = 0; i < width; i++){
+	    for(int j = 0; j < height; j++){
+		Integer col = hist.getRGB(i,j);
+		
+		if(col == Color.WHITE.getRGB()){
+		    prop += 1.0f;
+		}
+	    }
+	}
+
+	return prop/(float)(width * height) >= 0.25f;
     }
 
     //Generates a Vector of Subimages of the original image where each subimage is of
@@ -40,7 +60,9 @@ public class TheresWaldo {
 		int x = i * widthStep;
 		int y = j * heightStep;
 		BufferedImage subimage = image.getSubimage(x, y, width, height);
-		subimages.add(new Subimage(subimage, x, y));
+		if(possibleWaldo(subimage, x,y,width,height))
+		   subimages.add(new Subimage(subimage, x, y));
+		
 	    }
 	}
 
@@ -56,7 +78,8 @@ public class TheresWaldo {
 	    for(int i = 0; i < heightNum; i++){
 		int y = i * heightStep;
 		BufferedImage subimage = image.getSubimage(x, y, extraWidth * 2, height);
-		subimages.add(new Subimage(subimage, x, y));
+		if(possibleWaldo(subimage, x, y, extraWidth * 2,height))
+		   subimages.add(new Subimage(subimage, x, y));
 	    }   
 	}
 
@@ -67,7 +90,8 @@ public class TheresWaldo {
 	    for(int i = 0; i < widthNum; i++){
 		int x = i * widthStep;
 		BufferedImage subimage = image.getSubimage(x, y, width, 2 * extraHeight);
-		subimages.add(new Subimage(subimage, x, y));
+		if(possibleWaldo(subimage, x,y,width,2 * extraHeight))
+		   subimages.add(new Subimage(subimage, x, y));
 	    }
 	}
 
@@ -76,8 +100,9 @@ public class TheresWaldo {
 	if(extraWidth != 0 && extraHeight != 0){
 	    int x = totalWidth - (2 * extraWidth);
 	    int y = totalHeight - (2 * extraHeight);
-	    BufferedImage subimage = image.getSubimage(x, y, 2 * extraWidth, 2 * extraHeight);
-	    subimages.add(new Subimage(subimage, x, y));
+	    BufferedImage subimage = image.getSubimage(x, y, 2 * extraWidth, 2 * extraHeight );
+	    if(possibleWaldo(subimage, x,y,extraWidth * 2, extraHeight * 2))
+	       subimages.add(new Subimage(subimage, x, y));
 	}
     
 	return subimages;
@@ -93,7 +118,7 @@ public class TheresWaldo {
     //Write a Vector of subimages to the home directory
     public void writeSubimages(Vector<Subimage> subimages, String path) {
 	for(int i = 0; i < subimages.size(); i++){
-	    subimages.get(i).writeImage(path + ".jpg");
+	    subimages.get(i).writeImage(path + i + ".jpg");
 	}
     }
 }
