@@ -50,8 +50,6 @@ public class Histogram {
 	
 	// The number of pixels in the image to find frequencies of colors
 	int waldoPixels = waldoImage.getWidth() * waldoImage.getHeight();
-	
-	Hashtable<Integer, Float> counts = new Hashtable<Integer, Float>();
 
 	for( int x = 0; x < waldoImage.getWidth(); x++){
 	    for( int y = 0; y < waldoImage.getHeight(); y++){

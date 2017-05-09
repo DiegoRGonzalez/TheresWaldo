@@ -60,9 +60,13 @@ public class Subimage {
     }
 
     public boolean writeImage(String path){
+	return writeImage(path, getImage());
+    }
+
+    public static boolean writeImage(String path, BufferedImage image){
 	try{
 	    File outputfile = new File(path);
-	    ImageIO.write(getImage(), "jpg", outputfile);
+	    ImageIO.write(image, "jpg", outputfile);
 	    return true;
 	} catch(IOException e) {
 	    return false;

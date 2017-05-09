@@ -22,6 +22,7 @@ public class Main {
 	EdgeDetector ed = new EdgeDetector();
 	Classifier classifier = new Classifier();
 	ColorCorrection corrector = new ColorCorrection();
+	FullImageHistogram fullImHist = new FullImageHistogram();
 	int argLen = argv.length;
 
 	try{
@@ -36,9 +37,10 @@ public class Main {
 		
 	    }
 	    classifier.setStandard(waldoImages);
-	    
-	    
+
 	    BufferedImage image = ImageIO.read(new File(argv[i]));
+
+	    Subimage.writeImage("WWWFullHist", fullImHist.generateHistogram(image));
 	    image = corrector.normalize(image);
 
 	    TheresWaldo theresWaldo = new TheresWaldo(image);
@@ -60,7 +62,7 @@ public class Main {
 	    theresWaldo.writeSubimages(sd1To2, "SD1To2/Subimage");
 	    theresWaldo.writeSubimages(sd2To3, "SD2To3/Subimage");
 	    
-
+	    
 	} catch (Exception e){
 	    System.out.println(e);
 	    e.printStackTrace();
