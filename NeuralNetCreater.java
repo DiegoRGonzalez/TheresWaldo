@@ -13,7 +13,7 @@ public class NeuralNetCreater {
     private Instances train;
     private Instances test;
 
-    public NeuralNetCreator() {}
+    public NeuralNetCreater() {}
     
     public void saveNet(String path) {
 	try{
@@ -73,7 +73,7 @@ public class NeuralNetCreater {
     public void createNet() {
 	try {
 	    mlp = new MultilayerPerceptron();
-	    mlp.setOptions(Utils.splitOptions("-L 0.3 -M 0.2 -N 500 -V 100 -S 0 -E 1 -H 20"));
+	    mlp.setOptions(Utils.splitOptions("-L 0.2 -M 0.1 -N 500 -V 100 -S 0 -E 1 -H 20"));
 	} catch(Exception ex) {
 	    ex.printStackTrace();
 	}

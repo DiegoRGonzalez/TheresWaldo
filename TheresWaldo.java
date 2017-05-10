@@ -93,7 +93,7 @@ public class TheresWaldo {
     //Write a Vector of subimages to the home directory
     public void writeSubimages(Vector<Subimage> subimages, String path) {
 	for(int i = 0; i < subimages.size(); i++){
-	    subimages.get(i).writeImage(path + ".jpg");
+	    subimages.get(i).writeImage(path + i + ".jpg");
 	}
     }
 }
