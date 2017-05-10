@@ -236,47 +236,129 @@ public class Util {
 	
     }
 
-    public BufferedImage removeBackground(BufferedImage input){
-	    
-	int mostFilled = 0;
-	BufferedImage noBG = this.deepCopy(input);
-	int x = 0;
-	int y = 0;
-	for(int i = 0; i < input.getWidth()/4; i+=10){
-	    for(int j = 0; j < input.getHeight()/4; j+=10){
-		
-		
-		int newFilled = bucketFillNoSE(i,j,noBG,70);
-		if(newFilled > mostFilled){
-			System.out.println(newFilled);
-			mostFilled = newFilled;
-			x = i; y = j;
+
+
+    public BufferedImage getRedWhiteImg(BufferedImage input){
+	for(int i = 0; i < input.getWidth(); i++){
+	    for(int j = 0; j < input.getHeight(); j++){
+		Color color = new Color(input.getRGB(i,j));
+		if(!(isRed(color) || isWhite(color))){
+		    input.setRGB(i,j,Color.BLACK.getRGB());
 		}
+		
+	       	    
 	    }
 	}
-	System.out.println("DONE");
-	Color bg = new Color(input.getRGB(x,y));
-	bucketFill(x,y,noBG,70);    
-	/*for(int i = 0; i < input.getWidth(); i++){
-	     for(int j = 0; j < input.getHeight(); j++){
-		 noBG.setRGB(i,j,bg.getRGB());
-		 
-	     }
-	     }*/
-    
-				 
 
+	return input;
+	
+
+    }
+
+    public BufferedImage removeAllButColors(ArrayList<Color> colors, BufferedImage input, int threshhold){
+	for(int i = 0; i < input.getWidth(); i++){
+	    for(int j = 0; j < input.getHeight(); j++){
+		boolean keepColor = false;
+		for (int k = 0; k < colors.size() && !keepColor; k++){
+		    Color cur = new Color(input.getRGB(i,j));
+		    Color test = colors.get(k);
+		    keepColor = closeEnough(test, cur, threshhold);
+		}	
+		
+		if(!keepColor){
+		    input.setRGB(i,j,Color.BLACK.getRGB());
+		}
+	       	    
+	    }
+	}
+
+	return input;
+	
+
+    }
+
+    public BufferedImage getRedWhiteImgOLD(BufferedImage input, int threshhold){
+	ArrayList<Color> colors = new ArrayList<Color>();
+	colors.add(Color.RED);
+	colors.add(Color.WHITE);
+	colors.add(Color.PINK);
+	return removeAllButColors(colors, input, threshhold);
+	
+    }
+
+    public void writeImage(BufferedImage img, String path){
 	try{
-	    File outputfile = new File("color.jpg");
-	    ImageIO.write(noBG, "jpg", outputfile);
-	    File outputfile2 = new File("noBG.jpg");
-	    ImageIO.write(input, "jpg", outputfile2);
+	    File outputfile = new File(path);
+	    ImageIO.write(img, "jpg", outputfile);
 	}catch(Exception E){
 	    System.out.println("didn't work");
 	}
 	
-	return input;
     }
+
+    public boolean isWhite(Color test){
+	ColorCorrection colCorrector = new ColorCorrection();
+	test = colCorrector.make12Bit(test);
+	return isWhite12(test.getRed(), test.getGreen(), test.getBlue());
+	
+    }
+
+    
+    public boolean isRed(Color test){
+	ColorCorrection colCorrector = new ColorCorrection();
+	test = colCorrector.make12Bit(test);
+	return isRed12(test.getRed(), test.getGreen(), test.getBlue());
+	
+    }
+    
+
+    public boolean isWhite12(int red, int green, int blue){
+	Integer rbDiff = red-blue;
+	Integer rgDiff = red-green;
+	Integer bgDiff = Math.abs(blue-green);
+	return Math.abs(rbDiff) <= 3 && Math.abs(rgDiff) <= 3 && bgDiff <= 2;
+    }
+
+    public boolean isRed12(int red, int green, int blue){
+	Integer rbDiff = red-blue;
+	Integer rgDiff = red-green;
+	Integer bgDiff = Math.abs(blue-green);
+	return rbDiff >= 4 && rgDiff >= 4 && bgDiff <= 2;
+    }
+
+
+    
+
+    // public BufferedImage removeBackground(BufferedImage input){
+	    
+    // 	int mostFilled = 0;
+    // 	BufferedImage noBG = this.deepCopy(input);
+    // 	int x = 0;
+    // 	int y = 0;
+    // 	for(int i = 0; i < input.getWidth()/4; i+=10){
+    // 	    for(int j = 0; j < input.getHeight()/4; j+=10){
+		
+		
+    // 		int newFilled = bucketFillNoSE(i,j,noBG,70);
+    // 		if(newFilled > mostFilled){
+    // 			System.out.println(newFilled);
+    // 			mostFilled = newFilled;
+    // 			x = i; y = j;
+    // 		}
+    // 	    }
+    // 	}
+    // 	System.out.println("DONE");
+    // 	Color bg = new Color(input.getRGB(x,y));
+    // 	bucketFill(x,y,noBG,70);    
+    // 	/*for(int i = 0; i < input.getWidth(); i++){
+    // 	     for(int j = 0; j < input.getHeight(); j++){
+    // 		 noBG.setRGB(i,j,bg.getRGB());
+		 
+    // 	     }
+    // 	     }*/
+    
+    // 	return input;
+    // }
     
     
 }

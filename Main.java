@@ -43,7 +43,9 @@ public class Main {
 
 	    TheresWaldo theresWaldo = new TheresWaldo(image);
 	    Util n = new Util();
-	    n.removeBackground(image);
+	    //n.removeBackground(image);
+	    n.getRedWhiteImg(image);
+	    n.writeImage(image, "testnoRW.jpg");
 
 	    int[] window = ed.getSpliceSize(image);
 
