@@ -40,27 +40,29 @@ public class Main {
 
       BufferedImage image = ImageIO.read(new File(argv[i]));
       
-      Subimage.writeImage("WWWFullHist", fullImHist.generateHistogram(image));
+      BufferedImage histImage = fullImHist.generateHistogram(image);
+      Subimage.writeImage("WWWFullHist", histImage);
       image = corrector.normalize(image);
 
       TheresWaldo theresWaldo = new TheresWaldo(image);
 
       int[] window = ed.getSpliceSize(image);
 
-      Vector<Subimage> subimages = theresWaldo.createSubimages(window[0],window[1]);
+      Vector<Subimage> subimages = theresWaldo.createSubimages(window[0],window[1], histImage);
 
-      Util.scaleImages(subimages);
+      theresWaldo.writeSubimages(subimages, "AllImages/Subimage");
+      //      Util.scaleImages(subimages);
 
-      subimages = classifier.classify(subimages);
+      //      subimages = classifier.classify(subimages);
 
-      Vector<Subimage> sd0To1 = classifier.classifyByStandardDev(subimages, 0.0f, 1.0f);
+      /*Vector<Subimage> sd0To1 = classifier.classifyByStandardDev(subimages, 0.0f, 1.0f);
       Vector<Subimage> sd1To2 = classifier.classifyByStandardDev(subimages, 1.0f, 2.0f);
       Vector<Subimage> sd2To3 = classifier.classifyByStandardDev(subimages, 2.0f, 3.0f);
 
       theresWaldo.writeSubimages(sd0To1, "SD0To1/Subimage");
       theresWaldo.writeSubimages(sd1To2, "SD1To2/Subimage");
       theresWaldo.writeSubimages(sd2To3, "SD2To3/Subimage");
-
+      */
 
     } catch (Exception e){
       System.out.println(e);
