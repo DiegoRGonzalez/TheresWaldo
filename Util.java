@@ -309,7 +309,32 @@ public class Util {
 	return isRed12(test.getRed(), test.getGreen(), test.getBlue());
 	
     }
+
+    public int getRedPixelCount(BufferedImage image) {
+	int count = 0;
+	for(int i = 0; i < image.getWidth(); i++) {
+	    for(int j = 0; j < image.getHeight(); j++) {
+		Color color = new Color(image.getRGB(x,y));
+		if(isRed(color)) {
+		    count++;
+		}
+	    }
+	}
+	return count;
+    }
     
+    public int getWhitePixelCount(BufferedImage image) {
+	int count = 0;
+	for(int i = 0; i < image.getWidth(); i++) {
+	    for(int j = 0; j < image.getHeight(); j++) {
+		Color color = new Color(image.getRGB(x,y));
+		if(isWhite(color)) {
+		    count++;
+		}
+	    }
+	}
+	return count;
+    }
 
     public boolean isWhite12(int red, int green, int blue){
 	Integer rbDiff = red-blue;

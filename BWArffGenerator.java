@@ -14,6 +14,7 @@ public class BWArffGenerator {
     public BWArffGenerator() {}
 
     public Instance createInstance(BufferedImage image) {
+	Util util = new Util();
 	Instance inst = new Instance((image.getWidth() * image.getHeight()) + 3);
 	int i = 0;
 	for(int x = 0; x < image.getWidth(); x++) {
@@ -24,6 +25,12 @@ public class BWArffGenerator {
 	}
 	//Get white and red pixel count
 	//Add values to Instance (red pixel count, white pixel count, red to white pixel ratio)
+	int redCount = util.getRedPixelCount(image);
+	int whiteCount = util.getWhitePixelCount(image);
+	float ratio = ((float) redCount) / ((float) whiteCount);
+	inst.setValue(i++, redCount);
+	inst.setValue(i++, whiteCount);
+	inst.setValue(i++, ratio);
 	return inst;
     }
     
@@ -49,6 +56,12 @@ public class BWArffGenerator {
 	}
 	//Get white and red pixel count
 	//Add values to data (red pixel count, white pixel count, red to white pixel ratio)
+	int redCount = util.getRedPixelCount(image);
+	int whiteCount = util.getWhitePixelCount(image);
+	float ratio = ((float) redCount) / ((float) whiteCount);
+	data += redCount + ",";
+	data += whiteCount + ",";
+	data += ratio;
 	return data;
     }
 
