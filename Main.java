@@ -42,6 +42,8 @@ public class Main {
 	    image = corrector.normalize(image);
 
 	    TheresWaldo theresWaldo = new TheresWaldo(image);
+	    Util n = new Util();
+	    n.removeBackground(image);
 
 	    int[] window = ed.getSpliceSize(image);
 
