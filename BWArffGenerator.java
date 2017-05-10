@@ -48,6 +48,7 @@ public class BWArffGenerator {
 
     public String imageToArff(BufferedImage image) {
 	String data = "";
+	Util util = new Util();
 	for(int x = 0; x < image.getWidth(); x++) {
 	    for(int y = 0; y < image.getHeight(); y++) {
 		Color color = new Color(image.getRGB(x, y));

@@ -315,7 +315,7 @@ public class Util {
 	int count = 0;
 	for(int i = 0; i < image.getWidth(); i++) {
 	    for(int j = 0; j < image.getHeight(); j++) {
-		Color color = new Color(image.getRGB(x,y));
+		Color color = new Color(image.getRGB(i,j));
 		if(isRed(color)) {
 		    count++;
 		}
@@ -328,7 +328,7 @@ public class Util {
 	int count = 0;
 	for(int i = 0; i < image.getWidth(); i++) {
 	    for(int j = 0; j < image.getHeight(); j++) {
-		Color color = new Color(image.getRGB(x,y));
+		Color color = new Color(image.getRGB(i,j));
 		if(isWhite(color)) {
 		    count++;
 		}
