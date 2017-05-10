@@ -9,33 +9,40 @@ import java.io.PrintWriter;
 import java.awt.Color;
 import weka.core.Instance;
 
-public class ArffGenerator {
+public class BWArffGenerator {
 
-    public ArffGenerator() {}
+    public BWArffGenerator() {}
 
     public Instance createInstance(BufferedImage image) {
-	Instance inst = new Instance(3 * (image.getWidth() * image.getHeight()));
+	Util util = new Util();
+	Instance inst = new Instance((image.getWidth() * image.getHeight()) + 3);
 	int i = 0;
 	for(int x = 0; x < image.getWidth(); x++) {
 	    for(int y = 0; y < image.getHeight(); y++) {
 		Color color = new Color(image.getRGB(x, y));
-		inst.setValue(i++, color.getRed());
-		inst.setValue(i++, color.getGreen());
-		inst.setValue(i++, color.getBlue());
+		inst.setValue(i++, (color.equals(Color.WHITE) ? 1 : 0));
 	    }
 	}
+	//Get white and red pixel count
+	//Add values to Instance (red pixel count, white pixel count, red to white pixel ratio)
+	int redCount = util.getRedPixelCount(image);
+	int whiteCount = util.getWhitePixelCount(image);
+	float ratio = ((float) redCount) / ((float) whiteCount);
+	inst.setValue(i++, redCount);
+	inst.setValue(i++, whiteCount);
+	inst.setValue(i++, ratio);
 	return inst;
     }
     
     private String generateAttributes() {
 	String attr = "";
 	for(int i = 0; i < 625; i++) {
-	    attr += "@ATTRIBUTE pixel" + i + "red real\n";
-	    attr += "@ATTRIBUTE pixel" + i + "green real\n";
-	    attr += "@ATTRIBUTE pixel" + i + "blue real\n";
+	    attr += "@ATTRIBUTE pixel" + i + " {0, 1}\n";
 	}
+	attr += "@ATTRIBUTE redPixels Real\n";
+	attr += "@ATTRIBUTE whitePixels Real\n";
+	attr += "@ATTRIBUTE RedToWhite Real\n";
 	attr += "@ATTRIBUTE waldo {yes, no}\n";
-	
 	return attr;
     }
 
@@ -44,12 +51,18 @@ public class ArffGenerator {
 	for(int x = 0; x < image.getWidth(); x++) {
 	    for(int y = 0; y < image.getHeight(); y++) {
 		Color color = new Color(image.getRGB(x, y));
-		data += color.getRed() + ",";
-		data += color.getGreen() + ",";
-		data += color.getBlue() + ",";
+		data += (color.equals(Color.WHITE) ? 1 : 0) + ",";
 	    }
 	}
-	return data.substring(0,data.length()-1);
+	//Get white and red pixel count
+	//Add values to data (red pixel count, white pixel count, red to white pixel ratio)
+	int redCount = util.getRedPixelCount(image);
+	int whiteCount = util.getWhitePixelCount(image);
+	float ratio = ((float) redCount) / ((float) whiteCount);
+	data += redCount + ",";
+	data += whiteCount + ",";
+	data += ratio;
+	return data;
     }
 
     public void iterateFolders(String path, PrintWriter out) {
@@ -75,7 +88,7 @@ public class ArffGenerator {
     }
     
     public static void main(String[] args) {
-	ArffGenerator ag = new ArffGenerator();
+	BWArffGenerator ag = new BWArffGenerator();
 
 	if(args.length < 2) {
 	    System.out.println("Need to give a file name for .arff file and folder with test images");

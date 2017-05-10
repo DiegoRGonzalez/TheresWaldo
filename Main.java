@@ -49,8 +49,12 @@ public class Main {
       int[] window = ed.getSpliceSize(image);
 
       Vector<Subimage> subimages = theresWaldo.createSubimages(window[0],window[1], histImage);
-
       theresWaldo.writeSubimages(subimages, "AllImages/Subimage");
+	    
+      Util n = new Util();
+      //n.removeBackground(image);
+
+
       //      Util.scaleImages(subimages);
 
       //      subimages = classifier.classify(subimages);

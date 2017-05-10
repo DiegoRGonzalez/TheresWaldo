@@ -132,8 +132,8 @@ public class EdgeDetector {
 
     //Returns an int array with the width and height of a subimage size
     public int[] getSpliceSize(BufferedImage image, BufferedImage probImage){
-	ArrayList widthList = new ArrayList();
-	ArrayList heightList= new ArrayList();
+	ArrayList<Integer> widthList = new ArrayList<Integer>();
+	ArrayList<Integer> heightList= new ArrayList<Integer>();
 
 	BufferedImage result = Util.deepCopy(image);
 
