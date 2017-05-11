@@ -15,33 +15,35 @@ public class BWArffGenerator {
 
     public Instance createInstance(BufferedImage image) {
 	Util util = new Util();
-	Instance inst = new Instance((image.getWidth() * image.getHeight()) + 3);
+	//Instance inst = new Instance(3);
+	Instance inst = new Instance((image.getWidth() * image.getHeight()));
 	int i = 0;
 	for(int x = 0; x < image.getWidth(); x++) {
 	    for(int y = 0; y < image.getHeight(); y++) {
 		Color color = new Color(image.getRGB(x, y));
-		inst.setValue(i++, (color.equals(Color.WHITE) ? 1 : 0));
+		inst.setValue(i++, ((color.getRed() + color.getGreen() + color.getBlue()) / 3));
 	    }
 	}
 	//Get white and red pixel count
 	//Add values to Instance (red pixel count, white pixel count, red to white pixel ratio)
-	int redCount = util.getRedPixelCount(image);
+	/*int redCount = util.getRedPixelCount(image);
 	int whiteCount = util.getWhitePixelCount(image);
-	float ratio = ((float) redCount) / ((float) whiteCount);
+	int ratio = redCount / whiteCount;
 	inst.setValue(i++, redCount);
 	inst.setValue(i++, whiteCount);
-	inst.setValue(i++, ratio);
+	inst.setValue(i++, ratio);*/
 	return inst;
     }
     
     private String generateAttributes() {
 	String attr = "";
 	for(int i = 0; i < 625; i++) {
-	    attr += "@ATTRIBUTE pixel" + i + " {0, 1}\n";
+	    attr += "@ATTRIBUTE pixel" + i + " Real\n";
 	}
+	/*
 	attr += "@ATTRIBUTE redPixels Real\n";
 	attr += "@ATTRIBUTE whitePixels Real\n";
-	attr += "@ATTRIBUTE RedToWhite Real\n";
+	attr += "@ATTRIBUTE RedToWhite Real\n";*/
 	attr += "@ATTRIBUTE waldo {yes, no}\n";
 	return attr;
     }
@@ -52,17 +54,18 @@ public class BWArffGenerator {
 	for(int x = 0; x < image.getWidth(); x++) {
 	    for(int y = 0; y < image.getHeight(); y++) {
 		Color color = new Color(image.getRGB(x, y));
-		data += (color.equals(Color.WHITE) ? 1 : 0) + ",";
+		data += ((color.getRed() + color.getGreen() + color.getBlue()) / 3) + ",";
 	    }
 	}
 	//Get white and red pixel count
 	//Add values to data (red pixel count, white pixel count, red to white pixel ratio)
-	int redCount = util.getRedPixelCount(image);
-	int whiteCount = util.getWhitePixelCount(image);
-	float ratio = ((float) redCount) / ((float) whiteCount);
-	data += redCount + ",";
-	data += whiteCount + ",";
-	data += ratio;
+	//int redCount = util.getRedPixelCount(image);
+	//int whiteCount = util.getWhitePixelCount(image);
+	//float ratio = ((float) redCount) / ((float) whiteCount);
+	//int ratio = redCount / whiteCount;
+	//data += redCount + ",";
+	//data += whiteCount + ",";
+	//data += ratio;
 	return data;
     }
 
