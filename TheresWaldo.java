@@ -19,7 +19,7 @@ public class TheresWaldo {
 
     //Generates a Vector of Subimages of the original image where each subimage is of
     //the dimensions given and does a 50% overlap to avoid cutting something off
-    public Vector<Subimage> createSubimages(int width, int height, BufferedImage histImage) {
+    public Vector<Subimage> createSubimages(int width, int height, BufferedImage histImage, BufferedImage waldoImage) {
 	Vector<Subimage> subimages = new Vector<Subimage>();
 
 	//Save the dimensions of the original image
@@ -34,39 +34,63 @@ public class TheresWaldo {
 	//50% overlap
 	int widthStep = width / 2;
 	int heightStep = height / 2;
+	Node node = new Node();
 
 	//Go down both sides of the image and create subimages and put them in the Vector
 	for(int i = 0; i < totalWidth; i = i + widthStep){
 	    for(int j = 0; j < totalHeight; j = j + heightStep){
-	       
+		
 		float totalProb = 0;
 		float numPixels = 0;
-		for(int x = i; x < i + width && x < totalWidth; x++) {
-		    for(int y = j; y < j + height && y < totalHeight; y++) {
+		float numColored = 0;
+		
+		for(int x = i - widthStep; x < i + widthStep && x < totalWidth && i > widthStep; x++) {
+		    for(int y = j - heightStep; y < j + heightStep && y < totalHeight && j > heightStep; y++) {
 			numPixels += 1.0f;
 			Color probColor = new Color(histImage.getRGB(x, y));
 			int prob = probColor.getRed();
-			
-			totalProb += (float) prob;
+			if(prob > 0) {
+			    totalProb += (float) prob;
+			    numColored += 1.0f;
+			}
 			
 		    }
+		    
 		}
 
-		totalProb /= numPixels;
+		
+		totalProb /= (numColored > 0) ? numColored : 0.0f;
 		totalProb /= 255.0f;
-		if(totalProb > 0.02f){
-		    int nWidth = (width + i > totalWidth) ? totalWidth - 1 - i : width;
-		    int nHeight = (height + j > totalHeight) ? totalHeight - 1 - j : height;
+		
+		if(totalProb >= 0.3f && numColored/numPixels >= 0.01f){		  
+		    int x = (width + i > totalWidth) ? totalWidth - 1 - i : i;
+		    int y = (height + j > totalHeight) ? totalHeight - 1 - j : j;		    
+		    x = x - widthStep;
+		    y = y - heightStep;
+
+		    BufferedImage subimage = image.getSubimage(x,y , width, height);
 		    
-		    BufferedImage subimage = image.getSubimage(i, j, nWidth, nHeight);
-		    BufferedImage histSub = histImage.getSubimage(i, j, nWidth, nHeight);
-		    subimages.add(new Subimage(subimage, i, j));
-		    subimages.add(new Subimage(histSub, i, j));
+		    Subimage newImage = new Subimage(subimage, x,y);
+
+		    for(int r = i-widthStep; r < i + widthStep && r < totalWidth; r++) {
+			for(int s = j-heightStep; s < j + heightStep && s < totalHeight; s++) {
+			    waldoImage.setRGB(r,s, Color.BLACK.getRGB());
+			}
+			
+		    }
+
+		    node.insert(newImage, newImage.getConfLevel());
 		}
 	    }
 	}
-       
 
+	node = node.getNext();
+	while (node != null){
+	    subimages.add(node.getSubimage());
+	    node = node.getNext();
+	}
+	
+	Subimage.writeImage("SubbedImages", waldoImage);
 	return subimages;
     }
 
