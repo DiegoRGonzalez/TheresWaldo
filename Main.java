@@ -24,54 +24,57 @@ public class Main {
     ColorCorrection corrector = new ColorCorrection();
     FullImageHistogram fullImHist = new FullImageHistogram();
     int argLen = argv.length;
-
+    
     try{
-      int num = Integer.parseInt(argv[0]);
 
-      int i = 1;
-      Vector<Subimage> waldoImages = new Vector<Subimage>();
-      for(; i <= num; i++){
-        BufferedImage im = ImageIO.read(new File(argv[i]));
-        Subimage sub = new Subimage(im, 0, 0);
-        waldoImages.add(sub);
-
-      }
-      classifier.setStandard(waldoImages);
-
-      BufferedImage image = ImageIO.read(new File(argv[i]));
-      
-      BufferedImage histImage = fullImHist.generateHistogram(image);
-      Subimage.writeImage("WWWFullHist", histImage);
-      image = corrector.normalize(image);
-
-      TheresWaldo theresWaldo = new TheresWaldo(image);
-
-      int[] window = ed.getSpliceSize(image);
-
-      Vector<Subimage> subimages = theresWaldo.createSubimages(window[0],window[1], histImage);
-      theresWaldo.writeSubimages(subimages, "AllImages/Subimage");
+	//n.makeTraining(ImageIO.read(new File("waldoGreen.jpg")));
+	
+	int num = Integer.parseInt(argv[0]);
+	
+	int i = 1;
+	Vector<Subimage> waldoImages = new Vector<Subimage>();
+	for(; i <= num; i++){
+	    BufferedImage im = ImageIO.read(new File(argv[i]));
+	    Subimage sub = new Subimage(im, 0, 0);
+	    waldoImages.add(sub);
 	    
-      Util n = new Util();
-      //n.removeBackground(image);
+	}
+	classifier.setStandard(waldoImages);
+	Util n = new Util();
+	BufferedImage image = ImageIO.read(new File(argv[i]));
+	n.writeImage(image, "testing.jpg");
+	
+	BufferedImage histImage = fullImHist.generateHistogram(image);
+	Subimage.writeImage("WWWFullHist", histImage);
+	image = corrector.normalize(image);
+	
+	TheresWaldo theresWaldo = new TheresWaldo(image);
+	
+	int[] window = ed.getSpliceSize(image);
+	
+	Vector<Subimage> subimages = theresWaldo.createSubimages(window[0],window[1], histImage);
 
+	n.scaleImages(subimages);
+	theresWaldo.writeSubimages(subimages, "AllImages/Subimage");
+	
+	
+	//      Util.scaleImages(subimages);
+	
+	//      subimages = classifier.classify(subimages);
+	
+	/*Vector<Subimage> sd0To1 = classifier.classifyByStandardDev(subimages, 0.0f, 1.0f);
+	  Vector<Subimage> sd1To2 = classifier.classifyByStandardDev(subimages, 1.0f, 2.0f);
+	  Vector<Subimage> sd2To3 = classifier.classifyByStandardDev(subimages, 2.0f, 3.0f);
 
-      //      Util.scaleImages(subimages);
-
-      //      subimages = classifier.classify(subimages);
-
-      /*Vector<Subimage> sd0To1 = classifier.classifyByStandardDev(subimages, 0.0f, 1.0f);
-      Vector<Subimage> sd1To2 = classifier.classifyByStandardDev(subimages, 1.0f, 2.0f);
-      Vector<Subimage> sd2To3 = classifier.classifyByStandardDev(subimages, 2.0f, 3.0f);
-
-      theresWaldo.writeSubimages(sd0To1, "SD0To1/Subimage");
-      theresWaldo.writeSubimages(sd1To2, "SD1To2/Subimage");
-      theresWaldo.writeSubimages(sd2To3, "SD2To3/Subimage");
-      */
+	  theresWaldo.writeSubimages(sd0To1, "SD0To1/Subimage");
+	  theresWaldo.writeSubimages(sd1To2, "SD1To2/Subimage");
+	  theresWaldo.writeSubimages(sd2To3, "SD2To3/Subimage");
+	*/
 
     } catch (Exception e){
-      System.out.println(e);
-      e.printStackTrace();
-      usage();
+	System.out.println(e);
+	e.printStackTrace();
+	usage();
     }
   }
 }
