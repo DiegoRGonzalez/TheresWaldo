@@ -26,11 +26,11 @@ public class Main {
     int argLen = argv.length;
 
     try{
-      int num = Integer.parseInt(argv[0]);
+	int num = argv.length;
 
       int i = 1;
       Vector<Subimage> waldoImages = new Vector<Subimage>();
-      for(; i <= num; i++){
+      for(; i <= num - 2; i++){
         BufferedImage im = ImageIO.read(new File(argv[i]));
         Subimage sub = new Subimage(im, 0, 0);
         waldoImages.add(sub);
@@ -40,33 +40,35 @@ public class Main {
 
       BufferedImage image = ImageIO.read(new File(argv[i]));
       
-      BufferedImage histImage = fullImHist.generateHistogram(image);
-      Subimage.writeImage("WWWFullHist", histImage);
       image = corrector.normalize(image);
 
-      TheresWaldo theresWaldo = new TheresWaldo(image);
+      BufferedImage histImage = fullImHist.generateHistogram(image);
+      Subimage.writeImage("WWWFullHist", histImage);
 
+      TheresWaldo theresWaldo = new TheresWaldo(image);
+      
+      //BufferedImage redWhite = Util.getRedWhiteImg(image);
+      //Subimage.writeImage("REDWHITE", redWhite);
+      
       int[] window = ed.getSpliceSize(image);
 
-      Vector<Subimage> subimages = theresWaldo.createSubimages(window[0],window[1], histImage);
-      theresWaldo.writeSubimages(subimages, "AllImages/Subimage");
-	    
-      Util n = new Util();
+      Vector<Subimage> subimages = theresWaldo.createSubimages(25, 25, histImage);      
       //n.removeBackground(image);
 
+      //Util.scaleImages(subimages);
 
-      //      Util.scaleImages(subimages);
+      theresWaldo.writeSubimages(subimages, "AllImages/Subimage");
 
-      //      subimages = classifier.classify(subimages);
+      subimages = classifier.classify(subimages);
 
-      /*Vector<Subimage> sd0To1 = classifier.classifyByStandardDev(subimages, 0.0f, 1.0f);
+      Vector<Subimage> sd0To1 = classifier.classifyByStandardDev(subimages, 0.0f, 1.0f);
       Vector<Subimage> sd1To2 = classifier.classifyByStandardDev(subimages, 1.0f, 2.0f);
       Vector<Subimage> sd2To3 = classifier.classifyByStandardDev(subimages, 2.0f, 3.0f);
 
       theresWaldo.writeSubimages(sd0To1, "SD0To1/Subimage");
       theresWaldo.writeSubimages(sd1To2, "SD1To2/Subimage");
       theresWaldo.writeSubimages(sd2To3, "SD2To3/Subimage");
-      */
+      
 
     } catch (Exception e){
       System.out.println(e);

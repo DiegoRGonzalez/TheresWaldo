@@ -28,8 +28,6 @@ public class Util {
 
     return newImage;
   }
-
-
     
     //Returns an int array with the width and height of a subimage size
     public static void scaleImages(Vector<Subimage> images){
@@ -46,10 +44,12 @@ public class Util {
 		
 	    images.get(i).setImage(newImage);
 	}
+	
+	
 		
     }
 
-    public boolean closeEnough(Color one, Color two, int threshhold){
+    public static boolean closeEnough(Color one, Color two, int threshhold){
 	int rDiff = Math.abs(one.getRed() - two.getRed());
 	int gDiff = Math.abs(one.getGreen() - two.getGreen());
 	int bDiff = Math.abs(one.getBlue() - two.getBlue());
@@ -238,7 +238,7 @@ public class Util {
 
 
 
-    public BufferedImage getRedWhiteImg(BufferedImage input){
+    public static BufferedImage getRedWhiteImg(BufferedImage input){
 	for(int i = 0; i < input.getWidth(); i++){
 	    for(int j = 0; j < input.getHeight(); j++){
 		Color color = new Color(input.getRGB(i,j));
@@ -255,7 +255,7 @@ public class Util {
 
     }
 
-    public BufferedImage removeAllButColors(ArrayList<Color> colors, BufferedImage input, int threshhold){
+    public static BufferedImage removeAllButColors(ArrayList<Color> colors, BufferedImage input, int threshhold){
 	for(int i = 0; i < input.getWidth(); i++){
 	    for(int j = 0; j < input.getHeight(); j++){
 		boolean keepColor = false;
@@ -277,7 +277,7 @@ public class Util {
 
     }
 
-    public BufferedImage getRedWhiteImgOLD(BufferedImage input, int threshhold){
+    public static BufferedImage getRedWhiteImgOLD(BufferedImage input, int threshhold){
 	ArrayList<Color> colors = new ArrayList<Color>();
 	colors.add(Color.RED);
 	colors.add(Color.WHITE);
@@ -286,7 +286,7 @@ public class Util {
 	
     }
 
-    public void writeImage(BufferedImage img, String path){
+    public static void writeImage(BufferedImage img, String path){
 	try{
 	    File outputfile = new File(path);
 	    ImageIO.write(img, "jpg", outputfile);
@@ -296,7 +296,7 @@ public class Util {
 	
     }
 
-    public boolean isWhite(Color test){
+    public static boolean isWhite(Color test){
 	ColorCorrection colCorrector = new ColorCorrection();
 	test = colCorrector.make12Bit(test);
 	return isWhite12(test.getRed(), test.getGreen(), test.getBlue());
@@ -304,14 +304,14 @@ public class Util {
     }
 
     
-    public boolean isRed(Color test){
+    public static boolean isRed(Color test){
 	ColorCorrection colCorrector = new ColorCorrection();
 	test = colCorrector.make12Bit(test);
 	return isRed12(test.getRed(), test.getGreen(), test.getBlue());
 	
     }
 
-    public int getRedPixelCount(BufferedImage image) {
+    public static int getRedPixelCount(BufferedImage image) {
 	int count = 0;
 	for(int i = 0; i < image.getWidth(); i++) {
 	    for(int j = 0; j < image.getHeight(); j++) {
@@ -324,7 +324,7 @@ public class Util {
 	return count;
     }
     
-    public int getWhitePixelCount(BufferedImage image) {
+    public static int getWhitePixelCount(BufferedImage image) {
 	int count = 0;
 	for(int i = 0; i < image.getWidth(); i++) {
 	    for(int j = 0; j < image.getHeight(); j++) {
@@ -337,15 +337,15 @@ public class Util {
 	return count;
     }
 
-    public boolean isWhite12(int red, int green, int blue){
+    public static boolean isWhite12(int red, int green, int blue){
 	Integer rbDiff = red-blue;
 	Integer rgDiff = red-green;
 	Integer bgDiff = Math.abs(blue-green);
-	return Math.abs(rbDiff) <= 3 && Math.abs(rgDiff) <= 3 && bgDiff <= 2;
+	return rbDiff >= -2 && rbDiff <= 3 && rgDiff >= -2 && rgDiff <= 3 && bgDiff <= 2;
     }
 
-    public boolean isRed12(int red, int green, int blue){
-	Integer rbDiff = red-blue;
+    public static boolean isRed12(int red, int green, int blue){
+	Integer rbDiff =  red-blue;
 	Integer rgDiff = red-green;
 	Integer bgDiff = Math.abs(blue-green);
 	return rbDiff >= 4 && rgDiff >= 4 && bgDiff <= 2;

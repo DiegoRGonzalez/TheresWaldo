@@ -125,8 +125,8 @@ public class EdgeDetector {
 	int size = Math.max(height,width);
 
 	//Double the size of the person to make sure we get people inside our subimages
-	//return new int[]{2*size,2*size};
-	return new int[]{25, 25};
+	return new int[]{2*size,2*size};
+	//return new int[]{25, 25};
 
     }
 
