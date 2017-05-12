@@ -50,7 +50,7 @@ public class TheresWaldo {
 
 	    blackOutWaldoIm(waldoImage, xPos, yPos, width, height);
 	    
-	    node.insert(newImage, conf);
+	    node.insert(newImage, newImage.getConfLevel());
 	}
     }
 
@@ -75,7 +75,7 @@ public class TheresWaldo {
 	    
 	    blackOutWaldoIm(waldoImage, xPos, yPos, width, height);
 	    
-	    node.insert(newImage, conf);
+	    node.insert(newImage,  newImage.getConfLevel());
 	}
     }
 
@@ -98,7 +98,7 @@ public class TheresWaldo {
 	   
 	blackOutWaldoIm(waldoImage, xPos, yPos, width, height);
 
-	node.insert(newImage, conf);
+	node.insert(newImage,  newImage.getConfLevel());
     }
 
     public boolean createCenterIm(Node node, int x, int y, int width, int height, BufferedImage histImage, BufferedImage waldoImage){
@@ -142,7 +142,7 @@ public class TheresWaldo {
 	   
 	   blackOutWaldoIm(waldoImage, xPos, yPos, width, height);
 	   
-	   node.insert(newImage, totalProb);	
+	   node.insert(newImage,  newImage.getConfLevel());	
 	   createFirstQuartIm(node, totalProb, x, y, width, height, histImage, waldoImage);
 	   createSecondQuartIm(node, totalProb, x, y, width, height, histImage, waldoImage);
 	   createThirdQuartIm(node, totalProb, x, y, width, height, histImage, waldoImage);
@@ -153,23 +153,6 @@ public class TheresWaldo {
        return false;
     }
     
-    public void processImage(Node node, int x, int y, int width, int height, BufferedImage histImage, BufferedImage waldoImage){
-	int halfWidth = width/2;
-	int halfHeight = height/2;
-
-	int imWidth = waldoImage.getWidth();
-	int imHeight = waldoImage.getHeight();	
-
-	for(int i = 0; i < imWidth; i++){
-	    for(int j = 0; j < imHeight; j++){
-		Color prob = new Color(histImage.getRGB(i,j));
-		if(prob.getRGB() != Color.BLACK.getRGB()){
-		    createCenterIm(node, i, j, width, height, histImage, waldoImage);
-		}
-	    }
-	}
-	
-    }
     
     //Generates a vector of Subimages of the original image where each subimage is of
     //the dimensions given and does a 50% overlap to avoid cutting something off
@@ -201,61 +184,10 @@ public class TheresWaldo {
 		Color prob = new Color(histImage.getRGB(i,j));
 		if(prob.getRGB() != Color.BLACK.getRGB()){
 		    createCenterIm(node, i, j, width, height, histImage, waldoImage);
-			// createFirstQuartIm(node, i, j, width, height, histImage, waldoImage);
-			// createSecondQuartIm(node, i, j, width, height, histImage, waldoImage);
-			// createThirdQuartIm(node, i, j, width, height, histImage, waldoImage);
 		}
 	    }
 	}
 	
-
-	// //Go down both sides of the image and create subimages and put them in the Vector
-	// for(int i = 0; i < totalWidth; i = i + widthStep){
-	//     for(int j = 0; j < totalHeight; j = j + heightStep){
-		
-	// 	float totalProb = 0;
-	// 	float numPixels = 0;
-	// 	float numColored = 0;
-		
-	// 	for(int x = i - widthStep; x < i + widthStep && x < totalWidth && i > widthStep; x++) {
-	// 	    for(int y = j - heightStep; y < j + heightStep && y < totalHeight && j > heightStep; y++) {
-	// 		numPixels += 1.0f;
-	// 		Color probColor = new Color(histImage.getRGB(x, y));
-	// 		int prob = probColor.getRed();
-	// 		if(prob > 0) {
-	// 		    totalProb += (float) prob;
-	// 		    numColored += 1.0f;
-	// 		}
-			
-	// 	    }
-		    
-	// 	}
-
-		
-	// 	totalProb /= (numColored > 0) ? numColored : 0.0f;
-	// 	totalProb /= 255.0f;
-		
-	// 	if(totalProb >= 0.1f && numColored/numPixels >= 0.01f){		  
-	// 	    int x = (width + i > totalWidth) ? totalWidth - 1 - i : i;
-	// 	    int y = (height + j > totalHeight) ? totalHeight - 1 - j : j;		    
-	// 	    x = x - widthStep;
-	// 	    y = y - heightStep;
-
-	// 	    BufferedImage subimage = image.getSubimage(x, y , width, height);
-		    
-	// 	    Subimage newImage = new Subimage(subimage, x, y);
-
-	// 	    for(int r = i-widthStep; r < i + widthStep && r < totalWidth; r++) {
-	// 		for(int s = j-heightStep; s < j + heightStep && s < totalHeight; s++) {
-	// 		    waldoImage.setRGB(r,s, Color.BLACK.getRGB());
-	// 		}
-			
-	// 	    }
-
-	// 	    node.insert(newImage, newImage.getConfLevel());
-	// 	}
-	//     }
-	// }
 
     node = node.getNext();
 	while (node != null){

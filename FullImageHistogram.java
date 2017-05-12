@@ -1,4 +1,4 @@
-// (c) 2017 Jose Rivas-Garcia, Diego Gonzales and John Freeman
+// (c) 2017 Jose Rivas-Garcia, Diego Gonzalez and John Freeman
 
 import java.io.File;
 import java.io.IOException;
@@ -168,7 +168,7 @@ public class FullImageHistogram {
 	      float white = probCol.getGreen()/255.0f;
 	      float rwProp = probCol.getBlue()/255.0f;
 	      	      
-	      if(red >= 0.2f && white >= 0.1f && rwProp >= 0.1f){
+	      if(red >= 0.2f && white >= 0.1f && rwProp >= 0.1f && rwProp <= 0.9f){
 		  if (col2.getRGB() != Color.BLACK.getRGB() && curColor.getRGB() == col2.getRGB()) {
 		      sameCol += 1.0f;
 		  }
@@ -204,6 +204,44 @@ public class FullImageHistogram {
     }
    
 
+    public void finalPass(BufferedImage writeImage, BufferedImage write){
+	int width = writeImage.getWidth();
+	int height = writeImage.getHeight();
+
+	for( int x = 0; x < width; x++) {
+	  for( int y = 0; y < height; y++) {
+	      Color writeCol = new Color(writeImage.getRGB(x,y));
+	      int oldProbsTot = 0;
+	      float numPix = 0.0f;
+	      float numColored = 0.0f;
+	      for(int i = x - 2; i < x+2; i++){
+		  if(i >= 0 && i < width){
+		      for (int j = y-2; j < y+2; j++){
+			  if(j >= 0 && j < height && i != x && j != y){
+			      Color oldCol = new Color(writeImage.getRGB(i,j));
+			      int rProp = oldCol.getRed();
+			      int wProp = oldCol.getGreen();
+			      numPix += 1.0f;
+			      
+			      if(rProp > 0 && wProp > 0) {
+				  oldProbsTot += rProp + wProp;
+				  numColored += 1.0f;
+			      }				  
+			      
+			  }
+		      }
+		  }
+	      }
+
+	      int w = (numColored/numPix >= 0.0f && numColored/numPix <= 0.9f) ? (int) (oldProbsTot/numColored) : 0;
+	      if(w > 255) w = 255;
+	      Color newCol = new Color(w,w,w);
+	      
+	      write.setRGB(x,y, newCol.getRGB());
+	  }
+      }
+    }
+
     public BufferedImage generateHistogram(BufferedImage wIm) {
       float bitAmountf = 15.0f;
 
@@ -228,46 +266,13 @@ public class FullImageHistogram {
 
       Subimage.writeImage("Here2", writeImage);
 
-      //repeatPass(waldoImage, writeImage, 10);
-
       repeatPass(waldoImage, writeImage, 5);
 
-      //      repeatPass(waldoImage, writeImage, 12);
-
       Subimage.writeImage("Here10", writeImage);
+
       BufferedImage write = new BufferedImage(writeImage.getWidth(), writeImage.getHeight(), writeImage.getType());
       
-      for( int x = 0; x < width; x++) {
-	  for( int y = 0; y < height; y++) {
-	      Color writeCol = new Color(writeImage.getRGB(x,y));
-	      int oldProbsTot = 0;
-	      int numPix = 0;
-	      for(int i = x - 2; i < x+2; i++){
-		  if(i >= 0 && i < writeImage.getWidth()){
-		      for (int j = y-2; j < y+2; j++){
-			  if(j >= 0 && j < writeImage.getHeight() && i != x && j != y){
-			      numPix += 1;
-			      Color oldCol = new Color(writeImage.getRGB(i,j));
-			      int rProp = oldCol.getRed();
-			      int wProp = oldCol.getGreen();
-			      int rw = oldCol.getBlue();
-			      float rwProp = rw/255.0f; 
-			      if(rwProp >= 0.1f && rwProp <= 0.9f){
-				  oldProbsTot += rProp + wProp;
-			      }
-			      
-			  }
-		      }
-		  }
-	      }
-
-	      int w = oldProbsTot/numPix;
-	      if(w > 255) w = 255;
-	      Color newCol = new Color(w,w,w);
-	      
-	      write.setRGB(x,y, newCol.getRGB());
-	  }
-      }
+      finalPass(writeImage, write);
       
       return write;
 
