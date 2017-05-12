@@ -10,6 +10,8 @@ import java.awt.image.WritableRaster;
 import java.awt.image.ColorModel;
 import java.awt.Graphics;
 import java.util.Vector;
+import java.util.Random;
+
 
 public class Util {
 
@@ -58,191 +60,15 @@ public class Util {
 
     }
 
-    /*    public int bucketFill(int x, int y, BufferedImage input, BufferedImage buffer){
-	Color original = new Color(input.getRGB(x,y));
-	int numFilled = 0;
-	
-
-	if(x+1 < input.getWidth()){
-	    Color right = new Color(input.getRGB(x+1,y));
-	    Color test = new Color(buffer.getRGB(x+1,y));
-	    if(test != Color.BLACK && closeEnough(original,right,50)){
-		buffer.setRGB(x,y,Color.BLACK.getRGB());
-		numFilled += 1 + bucketFill(x+1,y,input,buffer);
-	    }
-	    
-	}
-
-	if(x-1 >= 0){
-	    Color left = new Color(input.getRGB(x-1,y));
-	    Color test = new Color(buffer.getRGB(x-1,y));
-	    if(test != Color.BLACK && closeEnough(original,left,50)){
-		buffer.setRGB(x,y,Color.BLACK.getRGB());
-		numFilled += 1 + bucketFill(x-1,y,input,buffer);
-	    }
-	}
-
-	if(y+1 < input.getHeight()){
-	    Color up = new Color(input.getRGB(x,y+1));
-	    Color test = new Color(buffer.getRGB(x,y+1));
-	    if(test != Color.BLACK && closeEnough(original,up,50)){
-		buffer.setRGB(x,y,Color.BLACK.getRGB());
-		numFilled += 1 + bucketFill(x,y+1,input,buffer);
-	    }
-
-	}
-
-	if(y-1 >= 0){
-	    Color down = new Color(input.getRGB(x,y-1));
-	    Color test = new Color(buffer.getRGB(x,y-1));
-	    if(test != Color.BLACK && closeEnough(original,down,50)){
-		buffer.setRGB(x,y,Color.BLACK.getRGB());
-		numFilled += 1 + bucketFill(x,y-1,input,buffer);
-	    }
-	}
-
-
-	System.out.println(numFilled);
-	return numFilled;
-
-    }
-    */
-
-
-    public int bucketFillNoSE(int x,int y,BufferedImage image, int threshhold){
-	ArrayList<ArrayList<Boolean>> buffer = new ArrayList<ArrayList<Boolean>>();
-	for(int i = 0; i < image.getWidth(); i++){
-
-	    ArrayList<Boolean> innerBuffer = new ArrayList<Boolean>();
-	    for(int j = 0; j < image.getHeight(); j++){
-		innerBuffer.add(false);
-	    }    
-	    buffer.add(innerBuffer);
-
-	}
-	buffer.get(x).set(y, true);
-	Color originalColor = new Color(image.getRGB(x,y));
-	int numFilled = 0;
-	for(int i = x; i > 0; i--){
-	    for(int j = y; j > 0; j--){
-		Color test = new Color(image.getRGB(i,j));
-		if(!buffer.get(i).get(j) && closeEnough(originalColor, test, threshhold)){
-			if(buffer.get(i+1).get(j) || buffer.get(i-1).get(j) ||
-			   buffer.get(i).get(j+1) || buffer.get(i).get(j-1)){
-			    buffer.get(i).set(j,true);
-			    numFilled++;
-		
-			}
-		} 
-	    }
-	}
-
-	for(int i = 1; i < (image.getWidth() - 1); i++){
-	    for(int j = 1; j < (image.getHeight() - 1); j++){
-		Color test = new Color(image.getRGB(i,j));
-		if(!buffer.get(i).get(j) && closeEnough(originalColor, test, threshhold)){
-			if(buffer.get(i+1).get(j) || buffer.get(i-1).get(j) ||
-			   buffer.get(i).get(j+1) || buffer.get(i).get(j-1)){
-			    buffer.get(i).set(j,true);
-			    numFilled++;
-		
-			}
-		} 
-	    }
-	}	
-
-
-	for(int i = (image.getWidth() -5); i > 5; i--){
-	    for(int j = (image.getHeight() -5); j > 5; j--){
-		Color test = new Color(image.getRGB(i,j));
-		if(!buffer.get(i).get(j) && closeEnough(originalColor, test, threshhold)){
-			if(buffer.get(i+1).get(j) || buffer.get(i-1).get(j) ||
-			   buffer.get(i).get(j+1) || buffer.get(i).get(j-1)){
-			    buffer.get(i).set(j,true);
-			    numFilled++;
-
-			}
-		} 
-	    }
-	}
-
-
-	return numFilled;
-	
-    }
-
-
-    public int bucketFill(int x,int y,BufferedImage image, int threshhold){
-	ArrayList<ArrayList<Boolean>> buffer = new ArrayList<ArrayList<Boolean>>();
-	for(int i = 0; i < image.getWidth(); i++){
-
-	    ArrayList<Boolean> innerBuffer = new ArrayList<Boolean>();
-	    for(int j = 0; j < image.getHeight(); j++){
-		innerBuffer.add(false);
-	    }    
-	    buffer.add(innerBuffer);
-
-	}
-	buffer.get(x).set(y, true);
-	Color originalColor = new Color(image.getRGB(x,y));
-	int numFilled = 0;
-	for(int i = x; i > 0; i--){
-	    for(int j = y; j > 0; j--){
-		Color test = new Color(image.getRGB(i,j));
-		if(!buffer.get(i).get(j) && closeEnough(originalColor, test, threshhold)){
-			if(buffer.get(i+1).get(j) || buffer.get(i-1).get(j) ||
-			   buffer.get(i).get(j+1) || buffer.get(i).get(j-1)){
-			    buffer.get(i).set(j,true);
-			    numFilled++;
-			    image.setRGB(i,j,Color.BLACK.getRGB());
-			}
-		} 
-	    }
-	}
-
-	for(int i = 1; i < (image.getWidth() - 5); i++){
-	    for(int j = 1; j < (image.getHeight() - 5); j++){
-		Color test = new Color(image.getRGB(i,j));
-		if(!buffer.get(i).get(j) && closeEnough(originalColor, test, threshhold)){
-			if(buffer.get(i+1).get(j) || buffer.get(i-1).get(j) ||
-			   buffer.get(i).get(j+1) || buffer.get(i).get(j-1)){
-			    buffer.get(i).set(j,true);
-			    numFilled++;
-			    image.setRGB(i,j,Color.BLACK.getRGB());
-			}
-		} 
-	    }
-	} 	
-
-
-
-	for(int i = (image.getWidth() -5); i > 5; i--){
-	    for(int j = (image.getHeight() -5); j > 5; j--){
-		Color test = new Color(image.getRGB(i,j));
-		if(!buffer.get(i).get(j) && closeEnough(originalColor, test, threshhold)){
-			if(buffer.get(i+1).get(j) || buffer.get(i-1).get(j) ||
-			   buffer.get(i).get(j+1) || buffer.get(i).get(j-1)){
-			    buffer.get(i).set(j,true);
-			    numFilled++;
-			    image.setRGB(i,j,Color.BLACK.getRGB());
-			}
-		} 
-	    }
-	}
-
-
- 
-	return numFilled;
-	
-    }
-
 
 
     public static BufferedImage getRedWhiteImg(BufferedImage input){
 	for(int i = 0; i < input.getWidth(); i++){
 	    for(int j = 0; j < input.getHeight(); j++){
 		Color color = new Color(input.getRGB(i,j));
-		if(!(isRed(color) || isWhite(color))){
+		if((isRed(color) || isWhite(color))){
+		    //input.setRGB(i,j,Color.WHITE.getRGB());
+		}else{
 		    input.setRGB(i,j,Color.BLACK.getRGB());
 		}
 		
@@ -307,7 +133,7 @@ public class Util {
     public static boolean isRed(Color test){
 	ColorCorrection colCorrector = new ColorCorrection();
 	test = colCorrector.make12Bit(test);
-	return isRed12(test.getRed(), test.getGreen(), test.getBlue());
+	return closeEnough(test, Color.RED, 150) || closeEnough(test, Color.PINK, 150) || closeEnough(test, Color.MAGENTA, 150) || isRed12(test.getRed(), test.getGreen(), test.getBlue());
 	
     }
 
@@ -352,38 +178,68 @@ public class Util {
     }
 
 
+   
+ 
+
+    public int randomRGB(){
+	Random rand = new Random();
+	int r = rand.nextInt(255);
+	int g = rand.nextInt(255);
+	int b = rand.nextInt(255);
+	
+	Color col = new Color(r,g,b);
+	
+	return col.getRGB();
+
+
+    }
+
+    public void makeTraining(BufferedImage input){
+	Color replace = new Color(0,191,10);
+
+
+
+	for(int i = 0; i < 3; i++){
+	    for(int j = 0; j < 3; j++){
+		    
+		    int x = (int)((float)i * 12.5f);
+		    int y = (int)((float)j * 12.5f);
+		    BufferedImage originalSub = input.getSubimage(x,y,25,25);
+
+		    int numBG = 10;
+		    for(int k = 0; k < numBG; k++){
+			BufferedImage newImage = deepCopy(originalSub);
+			replaceColor(newImage, replace, randomRGB());
+			writeImage(newImage, "trainWaldo" + i + "" + j + "" + k + ".jpg");
+		    }		   
+
+		    
+	    }
+	    
+	}
+    } 
     
 
-    // public BufferedImage removeBackground(BufferedImage input){
-	    
-    // 	int mostFilled = 0;
-    // 	BufferedImage noBG = this.deepCopy(input);
-    // 	int x = 0;
-    // 	int y = 0;
-    // 	for(int i = 0; i < input.getWidth()/4; i+=10){
-    // 	    for(int j = 0; j < input.getHeight()/4; j+=10){
+    
+    public void replaceColor(BufferedImage input, Color searchColor, int rgb){
+	for(int i = 0; i < input.getWidth(); i++){
+	    for(int j = 0; j < input.getHeight(); j++){
+		Color test = new Color(input.getRGB(i,j));
 		
+		if(closeEnough(test, searchColor,75)){
+		    input.setRGB(i,j,rgb);
+		}
 		
-    // 		int newFilled = bucketFillNoSE(i,j,noBG,70);
-    // 		if(newFilled > mostFilled){
-    // 			System.out.println(newFilled);
-    // 			mostFilled = newFilled;
-    // 			x = i; y = j;
-    // 		}
-    // 	    }
-    // 	}
-    // 	System.out.println("DONE");
-    // 	Color bg = new Color(input.getRGB(x,y));
-    // 	bucketFill(x,y,noBG,70);    
-    // 	/*for(int i = 0; i < input.getWidth(); i++){
-    // 	     for(int j = 0; j < input.getHeight(); j++){
-    // 		 noBG.setRGB(i,j,bg.getRGB());
-		 
-    // 	     }
-    // 	     }*/
-    
-    // 	return input;
-    // }
-    
-    
+	    }
+	}
+    }
 }
+
+
+
+
+
+    
+ 
+    
+    

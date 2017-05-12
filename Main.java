@@ -24,7 +24,7 @@ public class Main {
     ColorCorrection corrector = new ColorCorrection();
     FullImageHistogram fullImHist = new FullImageHistogram();
     int argLen = argv.length;
-
+    
     try{
 	int num = argv.length;
 
@@ -70,12 +70,11 @@ public class Main {
       theresWaldo.writeSubimages(sd0To1, "SD0To1/Subimage");
       theresWaldo.writeSubimages(sd1To2, "SD1To2/Subimage");
       theresWaldo.writeSubimages(sd2To3, "SD2To3/Subimage");
-      
-
+     
     } catch (Exception e){
-      System.out.println(e);
-      e.printStackTrace();
-      usage();
+	System.out.println(e);
+	e.printStackTrace();
+	usage();
     }
   }
 }

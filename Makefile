@@ -12,6 +12,7 @@ clean:
 	$(RM) SD0To1/Subimage*.jpg
 	$(RM) SD1To2/Subimage*.jpg
 	$(RM) SD2To3/Subimage*.jpg
+	$(RM) AllImages/Subimage*.jpg
 
 run0:
 	java Main Waldo/* WW0.jpg
