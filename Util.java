@@ -38,10 +38,10 @@ public class Util {
 
 	for(int i = 0; i < numImages; i++){
 	    BufferedImage before = images.get(i).getImage();
-	    BufferedImage newImage = new BufferedImage(25,25,BufferedImage.TYPE_INT_RGB);
+	    BufferedImage newImage = new BufferedImage(20,20,BufferedImage.TYPE_INT_RGB);
 
 	    Graphics g = newImage.createGraphics();
-	    g.drawImage(before,0,0,25,25,null);
+	    g.drawImage(before,0,0,20,20,null);
 	    g.dispose();
 		
 	    images.get(i).setImage(newImage);
