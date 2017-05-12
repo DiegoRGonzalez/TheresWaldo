@@ -7,6 +7,12 @@ import java.util.Scanner;
 import java.util.Vector;
 import java.util.Comparator;
 import java.util.PriorityQueue;
+import weka.core.*;
+import weka.core.Instances;
+import weka.classifiers.Evaluation;
+import weka.classifiers.*;
+import weka.classifiers.functions.MultilayerPerceptron;
+
 
 public class Main {
 
@@ -59,17 +65,48 @@ public class Main {
 
       //Util.scaleImages(subimages);
 
-      theresWaldo.writeSubimages(subimages, "AllImages/Subimage");
+      //theresWaldo.writeSubimages(subimages, "AllImages/Subimage");
 
       subimages = classifier.classify(subimages);
+      
+      try {
+	  MultilayerPerceptron mlp = (MultilayerPerceptron) weka.core.SerializationHelper.read("WaldoFinder.model");
+	  
+	  ArffGenerator ag = new ArffGenerator();
+	  Subimage waldo = new Subimage(image, 0, 0);
+	  double highestWaldo = 0;
+	  
+	  for(i = 0; i < subimages.size(); i++){
+	      Subimage subimage = subimages.get(i);
+	      Instance inst = ag.createInstance(subimage.getImage());
+	      double[] result = mlp.distributionForInstance(inst);
+	      if(highestWaldo < result[0]){
+		  highestWaldo = result[0];
+		  waldo = subimage;
+	      }
+	  }
 
-      Vector<Subimage> sd0To1 = classifier.classifyByStandardDev(subimages, 0.0f, 1.0f);
-      Vector<Subimage> sd1To2 = classifier.classifyByStandardDev(subimages, 1.0f, 2.0f);
-      Vector<Subimage> sd2To3 = classifier.classifyByStandardDev(subimages, 2.0f, 3.0f);
+	  waldo.writeImage("deffWaldoo");
 
-      theresWaldo.writeSubimages(sd0To1, "SD0To1/Subimage");
-      theresWaldo.writeSubimages(sd1To2, "SD1To2/Subimage");
-      theresWaldo.writeSubimages(sd2To3, "SD2To3/Subimage");
+	  
+	  
+	  
+
+      } catch(Exception ex) {
+	  ex.printStackTrace();
+      }
+
+      
+
+      
+
+      //Vector<Subimage> sd0To1 = classifier.classifyByStandardDev(subimages, 0.0f, 1.0f);
+      // Vector<Subimage> sd1To2 = classifier.classifyByStandardDev(subimages, 1.0f, 2.0f);
+      // Vector<Subimage> sd2To3 = classifier.classifyByStandardDev(subimages, 2.0f, 3.0f);
+
+      // theresWaldo.writeSubimages(sd0To1, "SD0To1/Subimage");
+      // theresWaldo.writeSubimages(sd1To2, "SD1To2/Subimage");
+      // theresWaldo.writeSubimages(sd2To3, "SD2To3/Subimage");
      
     } catch (Exception e){
 	System.out.println(e);
