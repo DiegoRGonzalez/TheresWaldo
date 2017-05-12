@@ -60,7 +60,7 @@ public class NeuralNetCreater {
 
     public void classify(BufferedImage image) {
 	try {
-	    ArffGenerator ag = new ArffGenerator();
+	    BWArffGenerator ag = new BWArffGenerator();
 	    Instance inst = ag.createInstance(image);
 	    double[] result = mlp.distributionForInstance(inst);
 	    System.out.println("Yes: "+result[0]);
@@ -73,7 +73,7 @@ public class NeuralNetCreater {
     public void createNet() {
 	try {
 	    mlp = new MultilayerPerceptron();
-	    mlp.setOptions(Utils.splitOptions("-L 0.2 -M 0.1 -N 500 -V 100 -S 0 -E 1 -H 20"));
+	    mlp.setOptions(Utils.splitOptions("-L 0.5 -M 0.1 -N 1000 -V 0 -S 0 -E 1 -H 20 -D"));
 	} catch(Exception ex) {
 	    ex.printStackTrace();
 	}
@@ -92,6 +92,9 @@ public class NeuralNetCreater {
 	    if(s.equals("-tr")) {
 		training_set = args[i];
 	    } else if(s.equals("-te")) {
+		testing_set = args[i];
+	    } else if(s.equals("-ote")) {
+		training_set = args[i++];
 		testing_set = args[i];
 	    } else if(s.equals("-s")) {
 		savefile = args[i];

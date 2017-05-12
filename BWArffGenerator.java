@@ -14,34 +14,34 @@ public class BWArffGenerator {
     public BWArffGenerator() {}
 
     public Instance createInstance(BufferedImage image) {
+	BufferedImage test = image;
 	Util util = new Util();
-	Instance inst = new Instance((image.getWidth() * image.getHeight()) + 3);
+	//Instance inst = new Instance(3);
+	Instance inst = new Instance((image.getWidth() * image.getHeight()));
 	int i = 0;
+	int average = 0;
 	for(int x = 0; x < image.getWidth(); x++) {
 	    for(int y = 0; y < image.getHeight(); y++) {
 		Color color = new Color(image.getRGB(x, y));
-		inst.setValue(i++, (color.equals(Color.WHITE) ? 1 : 0));
+		average = (color.getRed() + color.getGreen() + color.getBlue()) / 3;
+		if(util.isRed(color)) {
+		    average = (average * 2) / 3;
+		} else if (!util.isWhite(color)) {
+		    average /= 3;
+		}
+		inst.setValue(i++, average);
+		Color grey = new Color(average, average, average);
+		test.setRGB(x,y,grey.getRGB());
 	    }
 	}
-	//Get white and red pixel count
-	//Add values to Instance (red pixel count, white pixel count, red to white pixel ratio)
-	int redCount = util.getRedPixelCount(image);
-	int whiteCount = util.getWhitePixelCount(image);
-	float ratio = ((float) redCount) / ((float) whiteCount);
-	inst.setValue(i++, redCount);
-	inst.setValue(i++, whiteCount);
-	inst.setValue(i++, ratio);
 	return inst;
     }
     
     private String generateAttributes() {
 	String attr = "";
-	for(int i = 0; i < 625; i++) {
-	    attr += "@ATTRIBUTE pixel" + i + " {0, 1}\n";
+	for(int i = 0; i < 400; i++) {
+	    attr += "@ATTRIBUTE pixel" + i + " Real\n";
 	}
-	attr += "@ATTRIBUTE redPixels Real\n";
-	attr += "@ATTRIBUTE whitePixels Real\n";
-	attr += "@ATTRIBUTE RedToWhite Real\n";
 	attr += "@ATTRIBUTE waldo {yes, no}\n";
 	return attr;
     }
@@ -52,17 +52,15 @@ public class BWArffGenerator {
 	for(int x = 0; x < image.getWidth(); x++) {
 	    for(int y = 0; y < image.getHeight(); y++) {
 		Color color = new Color(image.getRGB(x, y));
-		data += (color.equals(Color.WHITE) ? 1 : 0) + ",";
+		int average = (color.getRed() + color.getGreen() + color.getBlue()) / 3;
+		if(util.isRed(color)) {
+		    average = (average * 2) / 3;
+		} else if (!util.isWhite(color)) {
+		    average /= 3;
+		}
+		data += average + ",";
 	    }
 	}
-	//Get white and red pixel count
-	//Add values to data (red pixel count, white pixel count, red to white pixel ratio)
-	int redCount = util.getRedPixelCount(image);
-	int whiteCount = util.getWhitePixelCount(image);
-	float ratio = ((float) redCount) / ((float) whiteCount);
-	data += redCount + ",";
-	data += whiteCount + ",";
-	data += ratio;
 	return data;
     }
 
