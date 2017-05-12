@@ -14,22 +14,25 @@ clean:
 	$(RM) SD2To3/Subimage*.jpg
 
 run0:
-	java Main 5 Waldo/* WW0.jpg
+	java Main Waldo/* WW0.jpg
 
 run1:
-	java Main 5 Waldo/* WW1.jpg
+	java Main Waldo/* WW1.jpg
 
 run2:
-	java Main 5 Waldo/* WW2.jpg
+	java Main Waldo/* WW2.jpg
 
 run3:
-	java Main 5 Waldo/* WW3.jpg
+	java Main Waldo/* WW3.jpg
 
 run4:
-	java Main 5 Waldo/* WW4.jpg
+	java Main Waldo/* WW4.jpg
+
+run5:
+	java Main Waldo/* WW5.jpg
 
 runP:
-	java Main 5 Waldo/* WWP.jpg
+	java Main Waldo/* WWP.jpg
 
 runNet:
 	java -cp /usr/share/java/weka.jar: Trainer

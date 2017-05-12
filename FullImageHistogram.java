@@ -224,11 +224,15 @@ public class FullImageHistogram {
 
       Subimage.writeImage("Here", writeImage);
 
-      repeatPass(waldoImage, writeImage, 2);
+      repeatPass(waldoImage, writeImage, 3);
 
       Subimage.writeImage("Here2", writeImage);
 
-      repeatPass(waldoImage, writeImage, 2);
+      //repeatPass(waldoImage, writeImage, 10);
+
+      repeatPass(waldoImage, writeImage, 5);
+
+      //      repeatPass(waldoImage, writeImage, 12);
 
       Subimage.writeImage("Here10", writeImage);
       BufferedImage write = new BufferedImage(writeImage.getWidth(), writeImage.getHeight(), writeImage.getType());

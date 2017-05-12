@@ -42,6 +42,8 @@ public class Main {
       
       image = corrector.normalize(image);
 
+      BufferedImage wIm = Util.deepCopy(image);
+
       BufferedImage histImage = fullImHist.generateHistogram(image);
       Subimage.writeImage("WWWFullHist", histImage);
 
@@ -52,7 +54,7 @@ public class Main {
       
       int[] window = ed.getSpliceSize(image);
 
-      Vector<Subimage> subimages = theresWaldo.createSubimages(25, 25, histImage);      
+      Vector<Subimage> subimages = theresWaldo.createSubimages(25, 25, histImage, wIm);      
       //n.removeBackground(image);
 
       //Util.scaleImages(subimages);
