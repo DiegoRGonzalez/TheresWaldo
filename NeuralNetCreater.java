@@ -6,6 +6,7 @@ import weka.classifiers.*;
 import weka.classifiers.functions.MultilayerPerceptron;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
+import java.util.Vector;
 
 public class NeuralNetCreater {
 
@@ -60,8 +61,13 @@ public class NeuralNetCreater {
 
     public void classify(BufferedImage image) {
 	try {
+	    Util util = new Util();
 	    BWArffGenerator ag = new BWArffGenerator();
-	    Instance inst = ag.createInstance(image);
+	    Subimage s = new Subimage(image,0,0);
+	    Vector<Subimage> vec = new Vector<Subimage>();
+	    vec.add(s);
+	    util.scaleImages(vec);
+	    Instance inst = ag.createInstance(vec.get(0).getImage());
 	    double[] result = mlp.distributionForInstance(inst);
 	    System.out.println("Yes: "+result[0]);
 	    System.out.println("No: "+result[1]);
@@ -73,7 +79,7 @@ public class NeuralNetCreater {
     public void createNet() {
 	try {
 	    mlp = new MultilayerPerceptron();
-	    mlp.setOptions(Utils.splitOptions("-L 0.5 -M 0.1 -N 1000 -V 0 -S 0 -E 1 -H 20 -D"));
+	    mlp.setOptions(Utils.splitOptions("-L 0.15 -M 0.2 -N 1000 -V 0 -S 0 -E 1 -H 160,8 -D"));
 	} catch(Exception ex) {
 	    ex.printStackTrace();
 	}
