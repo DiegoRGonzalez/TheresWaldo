@@ -75,19 +75,38 @@ public class Main {
 	  ArffGenerator ag = new ArffGenerator();
 	  Subimage waldo = new Subimage(image, 0, 0);
 	  double highestWaldo = 0;
+
+
+
+
+
+	  int maxSize = 100;
+	  Comparator<Subimage> comp = new SubimageComparator();
+	  PriorityQueue<Subimage> pq = new PriorityQueue<Subimage>(maxSize, comp);
 	  
 	  for(i = 0; i < subimages.size(); i++){
 	      Subimage subimage = subimages.get(i);
 	      Instance inst = ag.createInstance(subimage.getImage());
 	      double[] result = mlp.distributionForInstance(inst);
-	      if(highestWaldo < result[0]){
-		  highestWaldo = result[0];
-		  waldo = subimage;
+	      subimage.setNeuralConfidence(result[0]);
+
+	      if(pq.size() < maxSize){
+		  pq.add(subimage);
+	      }else{
+		  Subimage top = pq.remove();
+		  if(top.getNeuralConfidence() > subimage.getNeuralConfidence()){
+		      pq.add(top);
+		  }else{
+		      pq.add(subimage);
+		  }
+		  
 	      }
 	  }
-
-	  waldo.writeImage("deffWaldoo");
-
+	  
+	  while(pq.size() > 0){
+	      Subimage img = pq.remove();
+	      img.writeImage("PotentialWaldos/potWaldo" +pq.size()+ img.getCombConfLevel() + ".jpg");
+	  }
 	  
 	  
 	  
