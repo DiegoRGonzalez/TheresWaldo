@@ -19,25 +19,17 @@ public class Classifier {
     /* Takes a vector of Subimages and classifies them as either Waldo or Not Waldo.
      * The method calls "classify image" which classifies according to how much
      * red and white appears in the image.
-     *
-     * Right now, we really need to think about maybe looping through this multiple times
-     * with adjustable parameters for finding red and white. This way, we can continue to 
-     * filter until only half (at most) of the images are left. 
      */
     public Vector<Subimage> classify(Vector<Subimage> subimages) {
-	
-	// A Vector holding only those images that belong to Waldo
+   
 	Vector<Subimage> filter = new Vector<Subimage>();
-
 	final int numImages = subimages.size();
 
 	for(int i = 0; i < numImages; i++){
-	    
 	    Subimage sub = subimages.get(i);
 	    if(classifyImage(sub)){
 		filter.add(sub);
-	    }
-	    
+	    }	    
 	}
 
 	System.out.println(numImages + " " + filter.size());
@@ -54,11 +46,9 @@ public class Classifier {
 
 	// A Vector holding only those images that belong to Waldo
 	Vector<Subimage> filter = new Vector<Subimage>();
-
 	final int numImages = subimages.size();
 
-	for(int i = 0; i < numImages; i++){
-	    
+	for(int i = 0; i < numImages; i++){    
 	    Subimage sub = subimages.get(i);
 	    if(classifyImageByStandardDev(sub, minSD, maxSD)){
 		filter.add(sub);

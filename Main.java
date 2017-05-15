@@ -54,12 +54,15 @@ public class Main {
       
       int[] window = ed.getSpliceSize(image);
 
-      Vector<Subimage> subimages = theresWaldo.createSubimages(25, 25, histImage, wIm);      
+      SortedLinkedList sortedList = theresWaldo.createSubimages(25, 25, histImage);      
       //n.removeBackground(image);
 
-      //Util.scaleImages(subimages);
+      Vector<Subimage> subimages = new Vector<Subimage>();
+      sortedList.toVector(subimages);
 
-      theresWaldo.writeSubimages(subimages, "AllImages/Subimage");
+      Util.scaleImages(subimages);
+
+      //theresWaldo.writeSubimages(subimages, "AllImages/Subimage");
 
       subimages = classifier.classify(subimages);
 

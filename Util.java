@@ -58,57 +58,6 @@ public class Util {
 
     }
 
-    /*    public int bucketFill(int x, int y, BufferedImage input, BufferedImage buffer){
-	Color original = new Color(input.getRGB(x,y));
-	int numFilled = 0;
-	
-
-	if(x+1 < input.getWidth()){
-	    Color right = new Color(input.getRGB(x+1,y));
-	    Color test = new Color(buffer.getRGB(x+1,y));
-	    if(test != Color.BLACK && closeEnough(original,right,50)){
-		buffer.setRGB(x,y,Color.BLACK.getRGB());
-		numFilled += 1 + bucketFill(x+1,y,input,buffer);
-	    }
-	    
-	}
-
-	if(x-1 >= 0){
-	    Color left = new Color(input.getRGB(x-1,y));
-	    Color test = new Color(buffer.getRGB(x-1,y));
-	    if(test != Color.BLACK && closeEnough(original,left,50)){
-		buffer.setRGB(x,y,Color.BLACK.getRGB());
-		numFilled += 1 + bucketFill(x-1,y,input,buffer);
-	    }
-	}
-
-	if(y+1 < input.getHeight()){
-	    Color up = new Color(input.getRGB(x,y+1));
-	    Color test = new Color(buffer.getRGB(x,y+1));
-	    if(test != Color.BLACK && closeEnough(original,up,50)){
-		buffer.setRGB(x,y,Color.BLACK.getRGB());
-		numFilled += 1 + bucketFill(x,y+1,input,buffer);
-	    }
-
-	}
-
-	if(y-1 >= 0){
-	    Color down = new Color(input.getRGB(x,y-1));
-	    Color test = new Color(buffer.getRGB(x,y-1));
-	    if(test != Color.BLACK && closeEnough(original,down,50)){
-		buffer.setRGB(x,y,Color.BLACK.getRGB());
-		numFilled += 1 + bucketFill(x,y-1,input,buffer);
-	    }
-	}
-
-
-	System.out.println(numFilled);
-	return numFilled;
-
-    }
-    */
-
-
     public int bucketFillNoSE(int x,int y,BufferedImage image, int threshhold){
 	ArrayList<ArrayList<Boolean>> buffer = new ArrayList<ArrayList<Boolean>>();
 	for(int i = 0; i < image.getWidth(); i++){
