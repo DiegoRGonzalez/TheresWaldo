@@ -13,7 +13,10 @@ public class Subimage {
     private Histogram hist;
     private float confLevel;
     private double neuralConfidence;
-    
+    private float sd;
+    private int radius;
+
+
     //x and y correspond to the coordinate of top left corner of the subimage
     //in the original image. We can get the rest of the pixels this subimage
     //covers in the original image from the height and width of image.
@@ -22,14 +25,21 @@ public class Subimage {
     
     public Subimage(BufferedImage image, int x, int y) {
 	this.image = image;
-	this.x = x;
-	this.y = y;
+	this.x = x + 10;
+	this.y = y + 10;
 	this.hist = new Histogram(image);
 	this.confLevel = hist.getWaldoConfidence();
+	this.sd = 0.0f;
+	this.radius = 50;
     }
     
     public BufferedImage getImage() {
 	return image;
+    }
+
+    public int getRadius(){
+
+	return radius;
     }
     
     public void setImage(BufferedImage newImage){
@@ -63,12 +73,46 @@ public class Subimage {
 	return confLevel;
     }
 
+    public float getSD(){
+	return sd;
+    }
+
+    public float getSDConfLevel(){
+	float absSD = Math.abs(sd);
+	if(absSD <= 0.5f){
+	    return 1.0f;
+	} else if(absSD <= 1.0f){
+	    return 0.85f;
+	} else if(absSD <= 1.5f){
+	    return 0.65f;
+	} else if(absSD <= 2.0f){
+	    return 0.4f;
+	} else if(absSD <= 2.5f){
+	    return 0.25f;
+	} else if(absSD <= 3f){
+	    return 0.1f;
+	}
+
+	return 0.0f;
+    }
 
     public float getCombConfLevel(){
 	double nConf = this.getNeuralConfidence();
 	float pConf = this.getConfLevel();
 
-	return (float)nConf + pConf;
+	return 0.90f*(float)nConf + 1.0f*this.getSDConfLevel()*pConf;
+	
+
+    }
+
+    public void addSubimage(Subimage add){
+	x += (add.getX() - this.x)/2;
+	y += (add.getY() - this.y)/2;
+	this.setNeuralConfidence(Math.max(getNeuralConfidence() ,  add.getNeuralConfidence()));
+	this.setConfLevel(Math.max(getConfLevel() , add.getConfLevel()));
+	sd = Math.min(Math.abs(sd), Math.abs(add.getSD()));
+	
+	radius += Util.dist(this, add);
 	
 
     }
@@ -95,8 +139,16 @@ public class Subimage {
 	}
     }
     
-    public void setConfLevel(float conf){
+    public void setConfLevel(){
 	this.confLevel = hist.getWaldoConfidence();
+    }
+
+    public void setConfLevel(float newConfLevel){
+	confLevel = newConfLevel;
+    }
+
+    public void setSDLevel(float sd){
+	this.sd = sd;
     }
 
     public Histogram getHistogram(){
