@@ -241,7 +241,7 @@ public class FullImageHistogram {
 		}
 
 		// Determine the color value of those proportions, getting rid of places where too few pixels are colored. 
-		int w = (numColored/numPix >= 0.1f) ? (int) (oldPropsTot/numColored) : 0;
+		int w = (numColored/numPix >= 0.1f && numColored/numPix <= 0.9f) ? (int) (oldPropsTot/numColored) : 0;
 		if(w > 255) w = 255;
 		Color newCol = new Color(w,w,w);
 	      

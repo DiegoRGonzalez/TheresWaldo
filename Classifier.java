@@ -1,4 +1,4 @@
-// (c) 2017 Jose Rivas-Garcia, Diego Gonzales and John Freeman
+// (c) 2017 Jose Rivas-Garcia, Diego Gonzalez and John Freeman
 
 import java.io.File;
 import java.io.IOException;
@@ -16,43 +16,34 @@ public class Classifier {
     
     public Classifier () {}
 
-    /* Takes a vector of Subimages and classifies them as either Waldo or Not Waldo.
-     * The method calls "classify image" which classifies according to how much
-     * red and white appears in the image.
-     *
-     * Right now, we really need to think about maybe looping through this multiple times
-     * with adjustable parameters for finding red and white. This way, we can continue to 
-     * filter until only half (at most) of the images are left. 
+    /* Takes a vector of Subimages and classifies them according to how close they appear to be Waldo.
+     * The method calls "classify image" which classifies according to how much red and white appear.
      */
     public Vector<Subimage> classify(Vector<Subimage> subimages) {
 	
-	// A Vector holding only those images that belong to Waldo
 	Vector<Subimage> filter = new Vector<Subimage>();
-
-	final int numImages = subimages.size();
-
+	int numImages = subimages.size();
 	for(int i = 0; i < numImages; i++){
-	    
 	    Subimage sub = subimages.get(i);
 	    if(classifyImage(sub)){
 		filter.add(sub);
 	    }
-	    
 	}
-
-	System.out.println(numImages + " " + filter.size());
-	
 	return filter;
     }
 
+    /* Classifies a vector of images based on whether the images are within a certain range of standard 
+     * deviations away from the learned mean of red and white color proportion for a regular Waldo.
+     * Calls classifyImageByStandardDev to help classify an image. 
+     */
     public Vector<Subimage> classifyByStandardDev(Vector<Subimage> subimages, float minSD, float maxSD) {
-	
+       
+	// Make sure that the minSD is truly the minimum of minSD and maxSD
 	if (minSD > maxSD) {
 	    minSD = maxSD;
 	    maxSD = minSD;
 	}
 
-	// A Vector holding only those images that belong to Waldo
 	Vector<Subimage> filter = new Vector<Subimage>();
 
 	final int numImages = subimages.size();
@@ -65,28 +56,36 @@ public class Classifier {
 	    }
 	    
 	}
-
-	System.out.println(numImages + " " + filter.size());
 	
 	return filter;
     }
 
+    /* Calculates how many standard devations an image falls from a regular Waldo image. 
+     * The mean is the learned mean from a set of real Waldo images.
+     */
     public float getImageStandardDev(Subimage subimage){
 	float conf = subimage.getConfLevel();
 	
 	return Math.abs(conf - waldoConfidence) / waldoStandardErr;
     }
 
+    /* Determines whether an image falls within a given range of standard deviations from the mean.
+     */
     public boolean classifyImageByStandardDev(Subimage waldoImage, Float minSD, Float maxSD){
 	float sd = getImageStandardDev(waldoImage);
 	return (sd >= minSD && sd <= maxSD); 
     }
 
+    /* Determins whether the image falls within 3 standard deviations from the mean.
+     */
     public boolean classifyImage(Subimage waldoImage) {
 	float sd = getImageStandardDev(waldoImage);
 	return (sd <= 3.0f);
     }
 
+    /* Takes a vector of real Waldo images and determines the mean and standard deviation. This allows
+     * the program to determine whether or not another image is similar to a "real" Waldo image.
+     */
     public boolean setStandard(Vector<Subimage> waldoImages){
 	float mean = 0.0f;
 
