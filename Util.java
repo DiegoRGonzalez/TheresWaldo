@@ -181,7 +181,7 @@ public class Util {
    
  
 
-    public int randomRGB(){
+    public static int randomRGB(){
 	Random rand = new Random();
 	int r = rand.nextInt(255);
 	int g = rand.nextInt(255);
@@ -194,7 +194,7 @@ public class Util {
 
     }
 
-    public void makeTraining(BufferedImage input){
+    public static void makeTraining(BufferedImage input){
 	Color replace = new Color(0,191,10);
 
 
@@ -202,15 +202,15 @@ public class Util {
 	for(int i = 0; i < 3; i++){
 	    for(int j = 0; j < 3; j++){
 		    
-		    int x = (int)((float)i * 12.5f);
-		    int y = (int)((float)j * 12.5f);
-		    BufferedImage originalSub = input.getSubimage(x,y,25,25);
+		    int x = (int)((float)i * 10f);
+		    int y = (int)((float)j * 10f);
+		    BufferedImage originalSub = input.getSubimage(x,y,20,20);
 
-		    int numBG = 10;
+		    int numBG = 25;
 		    for(int k = 0; k < numBG; k++){
 			BufferedImage newImage = deepCopy(originalSub);
 			replaceColor(newImage, replace, randomRGB());
-			writeImage(newImage, "trainWaldo" + i + "" + j + "" + k + ".jpg");
+			writeImage(newImage, "train4/4noiseWaldo" + i + "" + j + "" + k + ".jpg");
 		    }		   
 
 		    
@@ -219,15 +219,64 @@ public class Util {
 	}
     } 
     
+    /*
+    public static void addCircle(int x, int y, int r, BufferedImage img){
+
+
+	for (int j = y-r; j < y+r; j++) {
+	    for (int i = x; Math.pow((i-x),2) + Math.pow((j-y),2) <= Math.pow(r,2); i--) {
+		
+		if(i > 0 && i < img.getWidth() && j > 0 && j < img.getHeight()){
+		    img.setRGB(i,j,Color.BLACK.getRGB());
+		    
+		}
+
+
+	    }
+	    for (int i = x+1; (i-x)*(i-x) + (j-y)*(j-y) <= r*r; i++) {
+		
+		if(i > 0 && i < img.getWidth() && j > 0 && j < img.getHeight()){
+		    img.setRGB(i,j,Color.BLACK.getRGB());
+
+		}
+
+
+	    }
+	}
+
+
+	
+
+
+    }*/
+    
+    public static void addCircle(int x, int y, int r, BufferedImage img){
+	Graphics g = img.createGraphics();
+	g.setColor(Color.GREEN);
+	g.drawOval(x-r/2, y-r/2, r, r);
+	int thickness = 6;
+	for(int i = 0; i < thickness; i++){
+	    r++;
+	    g.drawOval(x-r/2, y-r/2, r, r);
+	}
+
+    }
+
+
+    public static double dist(Subimage a, Subimage b){
+
+	return Math.sqrt(Math.pow(Math.abs(a.getX() - b.getX()),2) + Math.pow(Math.abs(a.getY() - b.getY()),2));
+
+    }
 
     
-    public void replaceColor(BufferedImage input, Color searchColor, int rgb){
+    public static void replaceColor(BufferedImage input, Color searchColor, int rgb){
 	for(int i = 0; i < input.getWidth(); i++){
 	    for(int j = 0; j < input.getHeight(); j++){
 		Color test = new Color(input.getRGB(i,j));
 		
 		if(closeEnough(test, searchColor,75)){
-		    input.setRGB(i,j,rgb);
+		    input.setRGB(i,j,randomRGB());
 		}
 		
 	    }
