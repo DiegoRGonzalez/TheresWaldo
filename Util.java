@@ -167,7 +167,7 @@ public class Util {
 	Integer rbDiff = red-blue;
 	Integer rgDiff = red-green;
 	Integer bgDiff = Math.abs(blue-green);
-	return rbDiff >= -2 && rbDiff <= 3 && rgDiff >= -2 && rgDiff <= 3 && bgDiff <= 2;
+	return rbDiff >= -2 && rbDiff <= 3 && rgDiff >= -2 && rgDiff <= 3 && bgDiff <= 2 && red >= 2;
     }
 
     public static boolean isRed12(int red, int green, int blue){

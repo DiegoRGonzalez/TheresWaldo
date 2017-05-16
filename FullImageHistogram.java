@@ -36,20 +36,6 @@ public class FullImageHistogram {
       return newImage;
     }
 
-    public boolean isWhite(int red, int green, int blue){
-      Integer rbDiff = red-blue;
-      Integer rgDiff = red-green;
-      Integer bgDiff = Math.abs(blue-green);
-      return rbDiff <= 3 && rbDiff >= -2 && rgDiff >= -2 && rgDiff <= 3 && bgDiff <= 2;
-    }
-
-    public boolean isRed(boolean wCheck, int red, int green, int blue){
-      Integer rbDiff = red-blue;
-      Integer rgDiff = red-green;
-      Integer bgDiff = Math.abs(blue-green);
-      return !wCheck && rbDiff >= 4 && rgDiff >= 4 && bgDiff <= 2;
-    }
-
     public void setRedWhiteImg(BufferedImage waldoImage) {
 	int width = waldoImage.getWidth();
 	int height = waldoImage.getHeight();
@@ -64,14 +50,9 @@ public class FullImageHistogram {
 
 		// Separate the Red, Green and Blue values.
 		Color col = new Color(rgbVal);
-		col = colCorrector.make12Bit(col);
 
-		Integer red = col.getRed();
-		Integer green = col.getGreen();
-		Integer blue = col.getBlue();
-
-		boolean wCheck = isWhite(red, green, blue);
-		boolean rCheck = isRed(wCheck, red, green, blue);
+		boolean wCheck = Util.isWhite(col);
+		boolean rCheck = Util.isRed(col);
 
 		// Check red and white
 		if(!(wCheck || rCheck)){
@@ -117,9 +98,10 @@ public class FullImageHistogram {
 			if( i != x && j != y && i >= 0 && j >= 0 && i < width && j < height){
 			    pixNum += 1.0f;
 			    Color col2 = new Color(waldoImage.getRGB(i,j));
-			    
-			    if (col2.getRGB() != Color.BLACK.getRGB() && curColor.getRGB() == col2.getRGB()) sameCol += 1;
-			    else if(col2.getRGB() != Color.BLACK.getRGB()) otherCol += 1;
+			    if(col2.getRGB() != Color.BLACK.getRGB()){
+				if (curColor.getRGB() == col2.getRGB()) sameCol += 1;
+				else otherCol += 1;
+			    }
 			}
 		    }
 		}
@@ -221,9 +203,10 @@ public class FullImageHistogram {
 			      Color oldCol = new Color(writeImage.getRGB(i,j));
 			      int rProp = oldCol.getRed();
 			      int wProp = oldCol.getGreen();
+			      int rwProp = oldCol.getBlue();
 			      numPix += 1.0f;
 			      
-			      if(rProp > 0 && wProp > 0) {
+			      if(rProp > 0 && wProp > 0 && rwProp >= 0.1f) {
 				  oldProbsTot += rProp + wProp;
 				  numColored += 1.0f;
 			      }				  
@@ -233,7 +216,7 @@ public class FullImageHistogram {
 		  }
 	      }
 
-	      int w = (numColored/numPix >= 0.0f && numColored/numPix <= 0.9f) ? (int) (oldProbsTot/numColored) : 0;
+	      int w = (numColored/numPix >= 0.1f && numColored/numPix <= 0.9f) ? (int) (oldProbsTot/numColored) : 0;
 	      if(w > 255) w = 255;
 	      Color newCol = new Color(w,w,w);
 	      
@@ -246,7 +229,9 @@ public class FullImageHistogram {
       float bitAmountf = 15.0f;
 
       BufferedImage waldoImage = deepCopy(wIm);
-
+      
+      Subimage.writeImage("image", waldoImage);
+      
       int height = waldoImage.getHeight();
       int width = waldoImage.getWidth();
 
@@ -265,7 +250,7 @@ public class FullImageHistogram {
       repeatPass(waldoImage, writeImage, 3);
 
       Subimage.writeImage("Here2", writeImage);
-
+      
       repeatPass(waldoImage, writeImage, 5);
 
       Subimage.writeImage("Here10", writeImage);
@@ -273,7 +258,7 @@ public class FullImageHistogram {
       BufferedImage write = new BufferedImage(writeImage.getWidth(), writeImage.getHeight(), writeImage.getType());
       
       finalPass(writeImage, write);
-      
+
       return write;
 
     }
