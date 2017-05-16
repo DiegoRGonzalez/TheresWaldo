@@ -11,15 +11,24 @@ public class Subimage {
     //Global variables
     private BufferedImage image;
     private Histogram hist;
+
+    //Confidence level given by histogram classifier and 
+    //corresponding standard deviation
     private float confLevel;
-    private double neuralConfidence;
     private float sd;
+
+    //Confidence level given by neuralnet
+    private double neuralConfidence;
+
+    //radius of circle
     private int radius;
 
 
     //x and y correspond to the coordinate of top left corner of the subimage
     //in the original image. We can get the rest of the pixels this subimage
-    //covers in the original image from the height and width of image.
+    //covers in the original image from the radius.
+    //
+    //Later is treated as center of potential waldo circle.
     private int x;
     private int y;
     
@@ -77,6 +86,8 @@ public class Subimage {
 	return sd;
     }
 
+    //Converts the SD into a percentage to be applied to the histogram confidence
+    //level to weight lower SD's as better
     public float getSDConfLevel(){
 	float absSD = Math.abs(sd);
 	if(absSD <= 0.5f){
@@ -96,6 +107,8 @@ public class Subimage {
 	return 0.0f;
     }
 
+
+    //Combine the two confidence levels
     public float getCombConfLevel(){
 	double nConf = this.getNeuralConfidence();
 	float pConf = this.getConfLevel();
@@ -105,6 +118,9 @@ public class Subimage {
 
     }
 
+
+    //Combine two subimages and generates a new x and y position and radius.
+    //Takes the higher of the two confidence levels for both nerual and histogram confidences
     public void addSubimage(Subimage add){
 	
 	this.setNeuralConfidence(Math.max(getNeuralConfidence() ,  add.getNeuralConfidence()));
@@ -112,6 +128,9 @@ public class Subimage {
 	sd = Math.min(Math.abs(sd), Math.abs(add.getSD()));
 	
 	double dist = Util.dist(this, add); 
+
+	//If the addition subimages is not contained within this subimage, adjust
+	//the radius and x/y accordingly
 	if((dist + add.getRadius()) > radius){
 
 	    Subimage a = add;
