@@ -1,3 +1,4 @@
+//(c) 2017 John Freeman, Jose Rivas, and Diego Gonzalez
 import java.io.*;
 import weka.core.*;
 import weka.core.Instances;
@@ -8,14 +9,18 @@ import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.util.Vector;
 
+//Class that creates, trains, tests, svaes, and reads Neural Nets
 public class NeuralNetCreater {
 
+    //Instance variables
     private MultilayerPerceptron mlp;
     private Instances train;
     private Instances test;
 
+    //Constructor
     public NeuralNetCreater() {}
     
+    //Saves the MultilayerPerceptron to a file
     public void saveNet(String path) {
 	try{
 	    weka.core.SerializationHelper.write(path, mlp);
@@ -24,6 +29,7 @@ public class NeuralNetCreater {
 	}
     }
 
+    //Reads the MultilayerPerceptron from a file
     public void reloadNet(String path) {
 	try {
 	    mlp = (MultilayerPerceptron) weka.core.SerializationHelper.read(path);
@@ -32,6 +38,7 @@ public class NeuralNetCreater {
 	}
     }
 
+    //Generates Instances from a given .arff file and trains the Neural Net on it
     public void trainNet(String training_set) {
 	try {
 	    FileReader trainreader = new FileReader(training_set);
@@ -44,6 +51,7 @@ public class NeuralNetCreater {
 	}
     }
 
+    //Generates Instances from a given .arff file and tests the Neural Net on it
     public void testNet(String testing_set) {
 	try{
 	    FileReader testreader = new FileReader(testing_set);
@@ -59,6 +67,8 @@ public class NeuralNetCreater {
 	}
     }
 
+    //Takes an image, generates an Instance from it for the Neural Net,
+    //and returns the result of distribution of that instance
     public void classify(BufferedImage image) {
 	try {
 	    Util util = new Util();
@@ -75,7 +85,8 @@ public class NeuralNetCreater {
 	    ex.printStackTrace();
 	}
     }
-    
+
+    //Creates a new MultilayerPerceptron using the given parameters
     public void createNet() {
 	try {
 	    mlp = new MultilayerPerceptron();
@@ -85,6 +96,7 @@ public class NeuralNetCreater {
 	}
     }
 
+    //Generates, tests, saves, or reads a neural net based on command line switches
     public static void main(String args[]) {	
 	NeuralNetCreater t = new NeuralNetCreater();
 	String training_set = "";

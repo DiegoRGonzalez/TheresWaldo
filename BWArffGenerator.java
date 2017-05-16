@@ -9,14 +9,16 @@ import java.io.PrintWriter;
 import java.awt.Color;
 import weka.core.Instance;
 
+//Creates a .arff file and instances based on given images
 public class BWArffGenerator {
-
+    
+    //Constructor
     public BWArffGenerator() {}
 
+    //Return an Instance of the given image
     public Instance createInstance(BufferedImage image) {
 	BufferedImage test = image;
 	Util util = new Util();
-	//Instance inst = new Instance(3);
 	Instance inst = new Instance((image.getWidth() * image.getHeight()));
 	int i = 0;
 	int average = 0;
@@ -37,6 +39,7 @@ public class BWArffGenerator {
 	return inst;
     }
     
+    //Generates the list of attributes for each instance
     private String generateAttributes() {
 	String attr = "";
 	for(int i = 0; i < 400; i++) {
@@ -46,6 +49,7 @@ public class BWArffGenerator {
 	return attr;
     }
 
+    //Returns the string representation of the given image for a .arff file
     public String imageToArff(BufferedImage image) {
 	String data = "";
 	Util util = new Util();
@@ -64,6 +68,7 @@ public class BWArffGenerator {
 	return data;
     }
 
+    //Iterate through folders to get all the images it it recursively
     public void iterateFolders(String path, PrintWriter out) {
 	File folder = new File(path);
 	String[] files = folder.list();
@@ -86,6 +91,7 @@ public class BWArffGenerator {
 	}
     }
     
+    //Creates a .arrf file with the name of the first argument based on the images in the second argument
     public static void main(String[] args) {
 	BWArffGenerator ag = new BWArffGenerator();
 
