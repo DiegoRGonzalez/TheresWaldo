@@ -1,0 +1,67 @@
+// (c) Jose Rivas and John Freeman and Diego Gonzales
+import java.io.File;
+import java.io.IOException;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
+import java.util.Vector;
+import java.awt.Color;
+
+public class SortedLinkedList {
+    private SortedLinkedList next;
+    private Subimage image;
+    private float conf;
+    private int size;
+
+    public SortedLinkedList(){
+	this.next = null;
+	this.image = null;
+	this.conf = 0;
+	this.size = 0;
+    }
+
+    public SortedLinkedList(Subimage image, float confLevel){
+	this.next = null;
+	this.image = image;
+	this.conf = confLevel;
+	this.size = 0;
+    }
+
+    public void insert(Subimage image, float confLevel){
+	if(next == null) {
+	    next = new SortedLinkedList(image, confLevel);
+	} else {
+	    SortedLinkedList temp = this;
+	    SortedLinkedList tempNxt = temp.getNext();
+	    while (tempNxt != null){
+		if(tempNxt.getConf() < confLevel) break;		
+		temp = temp.getNext();
+		tempNxt = temp.getNext();
+	    }
+	    
+	    SortedLinkedList newN = new SortedLinkedList(image, confLevel);
+	    temp.setNext(newN);
+	    newN.setNext(tempNxt);
+	} 
+	size++;
+    }
+
+    public int getSize(){
+	return size;
+    }
+
+    public SortedLinkedList getNext () {
+	return next;
+    }
+	
+    public float getConf() {
+	return conf;	      
+    }
+
+    public Subimage getSubimage(){
+	return image;
+    }
+
+    private void setNext(SortedLinkedList next){
+	this.next = next;
+    }
+}

@@ -167,7 +167,7 @@ public class Util {
 	Integer rbDiff = red-blue;
 	Integer rgDiff = red-green;
 	Integer bgDiff = Math.abs(blue-green);
-	return rbDiff >= -2 && rbDiff <= 3 && rgDiff >= -2 && rgDiff <= 3 && bgDiff <= 2 && red >= 2;
+	return rbDiff >= -2 && rbDiff <= 3 && rgDiff >= -2 && rgDiff <= 3 && bgDiff <= 2 && red >= 3;
     }
 
     public static boolean isRed12(int red, int green, int blue){
@@ -176,10 +176,6 @@ public class Util {
 	Integer bgDiff = Math.abs(blue-green);
 	return rbDiff >= 4 && rgDiff >= 4 && bgDiff <= 2;
     }
-
-
-   
- 
 
     public static int randomRGB(){
 	Random rand = new Random();
@@ -281,5 +277,17 @@ public class Util {
 		
 	    }
 	}
+    }
+
+    public static float[] adjustRGB(float[] toChange){
+	float[] adjusted = {0.0f, 0.0f, 0.0f};
+	adjusted[0] = (toChange[0] < 0.0f) ? 0.0f : toChange[0];
+	adjusted[1] = (toChange[1] < 0.0f) ? 0.0f : toChange[1];
+	adjusted[2] = (toChange[2] < 0.0f) ? 0.0f : toChange[2];
+
+	adjusted[0] = (toChange[0] > 255.0f) ? 255.0f : toChange[0];
+	adjusted[1] = (toChange[1] > 255.0f) ? 255.0f : toChange[1];
+	adjusted[2] = (toChange[2] > 255.0f) ? 255.0f : toChange[2];
+	return adjusted;
     }
 }
