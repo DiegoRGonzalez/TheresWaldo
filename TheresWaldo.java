@@ -189,7 +189,7 @@ public class TheresWaldo {
 	}
 	
 
-    node = node.getNext();
+	node = node.getNext();
 	while (node != null){
 	    subimages.add(node.getSubimage());
 	    node = node.getNext();

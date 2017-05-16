@@ -30,7 +30,7 @@ public class Subimage {
 	this.hist = new Histogram(image);
 	this.confLevel = hist.getWaldoConfidence();
 	this.sd = 0.0f;
-	this.radius = 50;
+	this.radius = 20;
     }
     
     public BufferedImage getImage() {
@@ -100,19 +100,51 @@ public class Subimage {
 	double nConf = this.getNeuralConfidence();
 	float pConf = this.getConfLevel();
 
-	return 0.90f*(float)nConf + 1.0f*this.getSDConfLevel()*pConf;
+	return 0.85f*(float)nConf + 1.0f*this.getSDConfLevel()*pConf;
 	
 
     }
 
     public void addSubimage(Subimage add){
-	x += (add.getX() - this.x)/2;
-	y += (add.getY() - this.y)/2;
+	
 	this.setNeuralConfidence(Math.max(getNeuralConfidence() ,  add.getNeuralConfidence()));
 	this.setConfLevel(Math.max(getConfLevel() , add.getConfLevel()));
 	sd = Math.min(Math.abs(sd), Math.abs(add.getSD()));
 	
-	radius += Util.dist(this, add);
+	double dist = Util.dist(this, add); 
+	if((dist + add.getRadius()) > radius){
+
+	    Subimage a = add;
+	    Subimage b = this;
+
+	    if(x < add.getX()){
+		a = this;
+		b = add;
+	    }
+
+	    int xRadius = ((b.getX() + b.getRadius()) - (a.getX() - a.getRadius()))/2;
+	    int newX = ((a.getX() - a.getRadius()) + xRadius);
+
+	    
+	    a = add;
+	    b = this;
+
+	    if(y < add.getY()){
+		a = this;
+		b = add;
+	    }
+
+
+	    int yRadius = ((b.getY() + b.getRadius()) - (a.getY() - a.getRadius()))/2;
+	    int newY = ((a.getY() - a.getRadius()) + yRadius);
+
+	    
+	    radius = (xRadius + yRadius)/2;
+
+	    x = newX;
+	    y = newY;
+	  
+	}
 	
 
     }

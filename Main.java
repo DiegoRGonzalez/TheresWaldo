@@ -68,17 +68,9 @@ public class Main {
       //BufferedImage redWhite = Util.getRedWhiteImg(image);
       //Subimage.writeImage("REDWHITE", redWhite);
       
-      int[] window = ed.getSpliceSize(image);
+      //int[] window = ed.getSpliceSize(image);
 
       Vector<Subimage> subimages = theresWaldo.createSubimages(25, 25, histImage, wIm);      
-
-     Vector<Subimage> sd0To1 = classifier.classifyByStandardDev(subimages, 0.0f, 1.0f);
-      Vector<Subimage> sd1To2 = classifier.classifyByStandardDev(subimages, 1.0f, 2.0f);
-      Vector<Subimage> sd2To3 = classifier.classifyByStandardDev(subimages, 2.0f, 3.0f);
-
-      theresWaldo.writeSubimages(sd0To1, "SD0To1/Subimage");
-      theresWaldo.writeSubimages(sd1To2, "SD1To2/Subimage");
-      theresWaldo.writeSubimages(sd2To3, "SD2To3/Subimage");
       //n.removeBackground(image);
 
       //Util.scaleImages(subimages);
@@ -87,26 +79,34 @@ public class Main {
 
 
       subimages = classifier.classify(subimages);
+      Util.scaleImages(subimages);
       
       try {
-	  MultilayerPerceptron mlp = (MultilayerPerceptron) weka.core.SerializationHelper.read("WaldoFinder.model");
+	  MultilayerPerceptron mlp = (MultilayerPerceptron) weka.core.SerializationHelper.read("WaldoFinderNoise.model");
 	  
 	  ArffGenerator ag = new ArffGenerator();
 	  Subimage waldo = new Subimage(image, 0, 0);
 	  double highestWaldo = 0;
 
+
+
+
+
 	  int maxSize = 50;
 	  Comparator<Subimage> comp = new SubimageComparator();
 	  PriorityQueue<Subimage> pq = new PriorityQueue<Subimage>(maxSize, comp);
-	  
+	    
 	  boolean added = false;
+	  int count = 0;
 	  for(i = 0; i < subimages.size();){
 	      added = false;
+
 	      for(int j = 0; j < subimages.size(); j++){
 		  Subimage img1 = subimages.get(i);
 		  Subimage img2 = subimages.get(j);
-		  if(i != j && Util.dist(img1,img2) < img1.getRadius()){
-		      
+		  
+		  if(i != j && Util.dist(img1,img2) < img1.getRadius() + img2.getRadius()){
+		      count++;
 		      img2.addSubimage(img1);
 		      subimages.remove(i);
 		      added = true;
@@ -120,6 +120,31 @@ public class Main {
 	      }
 
 	  }
+
+ for(i = 0; i < subimages.size();){
+	      added = false;
+
+	      for(int j = 0; j < subimages.size(); j++){
+		  Subimage img1 = subimages.get(i);
+		  Subimage img2 = subimages.get(j);
+		  
+		  if(i != j && Util.dist(img1,img2) < img1.getRadius() + img2.getRadius()){
+		      count++;
+		      img2.addSubimage(img1);
+		      subimages.remove(i);
+		      added = true;
+		      break;
+		  }
+
+	      }
+
+	      if(!added){
+		  i++;
+	      }
+
+	  }
+
+	  System.out.println("Consolidated " + count + " circles");
 	  
 
 	  for(i = 0; i < subimages.size(); i++){
@@ -144,9 +169,9 @@ public class Main {
 	  
 	  while(pq.size() > 0){
 	      Subimage img = pq.remove();
-	      img.writeImage("PotentialWaldos/potWaldo" +pq.size() + "__" + img.getCombConfLevel() + ".jpg");
+	      //img.writeImage("PotentialWaldos/potWaldo" +pq.size() + "__" + img.getCombConfLevel() + ".jpg");
 
-	      Util.addCircle(img.getX(), img.getY(), img.getRadius(), image);
+	      Util.addCircle(img.getX() + 13, img.getY() +13, img.getRadius(), image, "" + pq.size());
 	  }
 	  
 	  Util.writeImage(image, "circleTest.jpg");
@@ -158,6 +183,16 @@ public class Main {
       }
 
       
+
+      
+
+      //Vector<Subimage> sd0To1 = classifier.classifyByStandardDev(subimages, 0.0f, 1.0f);
+      // Vector<Subimage> sd1To2 = classifier.classifyByStandardDev(subimages, 1.0f, 2.0f);
+      // Vector<Subimage> sd2To3 = classifier.classifyByStandardDev(subimages, 2.0f, 3.0f);
+
+      // theresWaldo.writeSubimages(sd0To1, "SD0To1/Subimage");
+      // theresWaldo.writeSubimages(sd1To2, "SD1To2/Subimage");
+      // theresWaldo.writeSubimages(sd2To3, "SD2To3/Subimage");
      
     } catch (Exception e){
 	System.out.println(e);
