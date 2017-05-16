@@ -42,7 +42,7 @@ public class Util {
 
 	    Graphics g = newImage.createGraphics();
 	    g.drawImage(before,0,0,20,20,null);
-	    g.dispose();
+	    //g.dispose();
 		
 	    images.get(i).setImage(newImage);
 	}
@@ -215,45 +215,25 @@ public class Util {
 	}
     } 
     
-    /*
-    public static void addCircle(int x, int y, int r, BufferedImage img){
-
-
-	for (int j = y-r; j < y+r; j++) {
-	    for (int i = x; Math.pow((i-x),2) + Math.pow((j-y),2) <= Math.pow(r,2); i--) {
-		
-		if(i > 0 && i < img.getWidth() && j > 0 && j < img.getHeight()){
-		    img.setRGB(i,j,Color.BLACK.getRGB());
-		    
-		}
-
-
-	    }
-	    for (int i = x+1; (i-x)*(i-x) + (j-y)*(j-y) <= r*r; i++) {
-		
-		if(i > 0 && i < img.getWidth() && j > 0 && j < img.getHeight()){
-		    img.setRGB(i,j,Color.BLACK.getRGB());
-
-		}
-
-
-	    }
-	}
-
-
-	
-
-
-    }*/
     
-    public static void addCircle(int x, int y, int r, BufferedImage img){
+    public static void addCircle(int x, int y, int r, BufferedImage img, String str){
+	System.out.println("Adding circle: " + x + ", " + y + ", " + r);
 	Graphics g = img.createGraphics();
 	g.setColor(Color.GREEN);
-	g.drawOval(x-r/2, y-r/2, r, r);
+	g.drawOval(x-r, y-r, 2*r, 2*r);
 	int thickness = 6;
 	for(int i = 0; i < thickness; i++){
 	    r++;
-	    g.drawOval(x-r/2, y-r/2, r, r);
+	    g.drawOval(x-r, y-r, 2*r, 2*r);
+	}
+
+	if(str != ""){
+	    g.setColor(Color.WHITE);
+	    g.fillOval(x-5,y-15,30,30);
+	    g.setColor(Color.BLACK);
+	    g.drawString(str, x, y);
+	    
+
 	}
 
     }
