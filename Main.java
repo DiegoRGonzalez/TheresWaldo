@@ -10,6 +10,7 @@ import java.util.PriorityQueue;
 import weka.core.*;
 import weka.core.Instances;
 import weka.classifiers.Evaluation;
+import java.awt.Graphics;
 import weka.classifiers.*;
 import weka.classifiers.functions.MultilayerPerceptron;
 
@@ -47,6 +48,15 @@ public class Main {
       BufferedImage image = ImageIO.read(new File(argv[i]));
       
       image = corrector.normalize(image);
+      /*
+      BufferedImage img5 = ImageIO.read(new File("waldoGreen4.jpg"));
+      BufferedImage newImage = new BufferedImage(40,40,BufferedImage.TYPE_INT_RGB);
+      
+      Graphics g = newImage.createGraphics();
+      g.drawImage(img5,0,0,40,40,null);
+      g.dispose();
+      Util.makeTraining(newImage); 
+      */
 
       BufferedImage wIm = Util.deepCopy(image);
 
@@ -67,6 +77,7 @@ public class Main {
 
       //theresWaldo.writeSubimages(subimages, "AllImages/Subimage");
 
+
       subimages = classifier.classify(subimages);
       
       try {
@@ -80,15 +91,39 @@ public class Main {
 
 
 
-	  int maxSize = 100;
+	  int maxSize = 50;
 	  Comparator<Subimage> comp = new SubimageComparator();
 	  PriorityQueue<Subimage> pq = new PriorityQueue<Subimage>(maxSize, comp);
 	  
+	  boolean added = false;
+	  for(i = 0; i < subimages.size();){
+	      added = false;
+	      for(int j = 0; j < subimages.size(); j++){
+		  Subimage img1 = subimages.get(i);
+		  Subimage img2 = subimages.get(j);
+		  if(i != j && Util.dist(img1,img2) < img1.getRadius()){
+		      
+		      img2.addSubimage(img1);
+		      subimages.remove(i);
+		      added = true;
+		      break;
+		  }
+
+	      }
+
+	      if(!added){
+		  i++;
+	      }
+
+	  }
+	  
+
 	  for(i = 0; i < subimages.size(); i++){
 	      Subimage subimage = subimages.get(i);
 	      Instance inst = ag.createInstance(subimage.getImage());
 	      double[] result = mlp.distributionForInstance(inst);
 	      subimage.setNeuralConfidence(result[0]);
+	      
 
 	      if(pq.size() < maxSize){
 		  pq.add(subimage);
@@ -105,9 +140,12 @@ public class Main {
 	  
 	  while(pq.size() > 0){
 	      Subimage img = pq.remove();
-	      img.writeImage("PotentialWaldos/potWaldo" +pq.size()+ img.getCombConfLevel() + ".jpg");
+	      img.writeImage("PotentialWaldos/potWaldo" +pq.size() + "__" + img.getCombConfLevel() + ".jpg");
+
+	      Util.addCircle(img.getX(), img.getY(), img.getRadius(), image);
 	  }
 	  
+	  Util.writeImage(image, "circleTest.jpg");
 	  
 	  
 
