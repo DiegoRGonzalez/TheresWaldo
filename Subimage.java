@@ -37,7 +37,7 @@ public class Subimage {
 	this.x = x + 10;
 	this.y = y + 10;
 	this.hist = new Histogram(image);
-	this.confLevel = hist.getWaldoConfidence();
+	this.confLevel = hist.getRedWhiteProp();
 	this.sd = 0.0f;
 	this.radius = 20;
     }
@@ -191,7 +191,7 @@ public class Subimage {
     }
     
     public void setConfLevel(){
-	this.confLevel = hist.getWaldoConfidence();
+	this.confLevel = hist.getRedWhiteProp();
     }
 
     public void setConfLevel(float newConfLevel){
