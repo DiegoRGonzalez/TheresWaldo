@@ -61,6 +61,14 @@ public class Main {
       int[] window = ed.getSpliceSize(image);
 
       Vector<Subimage> subimages = theresWaldo.createSubimages(25, 25, histImage, wIm);      
+
+     Vector<Subimage> sd0To1 = classifier.classifyByStandardDev(subimages, 0.0f, 1.0f);
+      Vector<Subimage> sd1To2 = classifier.classifyByStandardDev(subimages, 1.0f, 2.0f);
+      Vector<Subimage> sd2To3 = classifier.classifyByStandardDev(subimages, 2.0f, 3.0f);
+
+      theresWaldo.writeSubimages(sd0To1, "SD0To1/Subimage");
+      theresWaldo.writeSubimages(sd1To2, "SD1To2/Subimage");
+      theresWaldo.writeSubimages(sd2To3, "SD2To3/Subimage");
       //n.removeBackground(image);
 
       //Util.scaleImages(subimages);
@@ -75,10 +83,6 @@ public class Main {
 	  ArffGenerator ag = new ArffGenerator();
 	  Subimage waldo = new Subimage(image, 0, 0);
 	  double highestWaldo = 0;
-
-
-
-
 
 	  int maxSize = 100;
 	  Comparator<Subimage> comp = new SubimageComparator();
@@ -116,16 +120,6 @@ public class Main {
       }
 
       
-
-      
-
-      //Vector<Subimage> sd0To1 = classifier.classifyByStandardDev(subimages, 0.0f, 1.0f);
-      // Vector<Subimage> sd1To2 = classifier.classifyByStandardDev(subimages, 1.0f, 2.0f);
-      // Vector<Subimage> sd2To3 = classifier.classifyByStandardDev(subimages, 2.0f, 3.0f);
-
-      // theresWaldo.writeSubimages(sd0To1, "SD0To1/Subimage");
-      // theresWaldo.writeSubimages(sd1To2, "SD1To2/Subimage");
-      // theresWaldo.writeSubimages(sd2To3, "SD2To3/Subimage");
      
     } catch (Exception e){
 	System.out.println(e);
