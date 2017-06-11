@@ -35,130 +35,100 @@ public class Main {
     try{
 	int num = argv.length;
 
-      int i = 1;
-      Vector<Subimage> waldoImages = new Vector<Subimage>();
-      for(; i <= num - 2; i++){
-        BufferedImage im = ImageIO.read(new File(argv[i]));
-        Subimage sub = new Subimage(im, 0, 0);
-        waldoImages.add(sub);
 
-      }
-      classifier.setStandard(waldoImages);
+	//Build our vector of training images for the classifier
+	int i = 1;
+	Vector<Subimage> waldoImages = new Vector<Subimage>();
+	for(; i <= num - 2; i++){
+	    BufferedImage im = ImageIO.read(new File(argv[i]));
+	    Subimage sub = new Subimage(im, 0, 0);
+	    waldoImages.add(sub);
+	    
+	}
 
-      BufferedImage image = ImageIO.read(new File(argv[i]));
-      
-      image = corrector.normalize(image);
-      /*
-      BufferedImage img5 = ImageIO.read(new File("waldoGreen4.jpg"));
-      BufferedImage newImage = new BufferedImage(40,40,BufferedImage.TYPE_INT_RGB);
-      
-      Graphics g = newImage.createGraphics();
-      g.drawImage(img5,0,0,40,40,null);
-      g.dispose();
-      Util.makeTraining(newImage); 
-      */
+	//Train the classifer
+	classifier.setStandard(waldoImages);
+	
+	//Grab the main image and perform preproccessing for TheresWaldo
+	BufferedImage image = ImageIO.read(new File(argv[i]));
 
-      BufferedImage wIm = Util.deepCopy(image);
+	//Preproccessing 
+	image = corrector.normalize(image);	
+	BufferedImage wIm = Util.deepCopy(image);
+	BufferedImage histImage = fullImHist.generateHistogram(image);
 
-      BufferedImage histImage = fullImHist.generateHistogram(image);
-      Subimage.writeImage("WWWFullHist", histImage);
+	//Create our vector of subimages to be checked for Waldonitiy
+	TheresWaldo theresWaldo = new TheresWaldo(image, histImage);
+	Vector<Subimage> subimages = theresWaldo.createSubimages(25, 25);      
+	
+	//Assign histogram confidence level to subimages and cut down potentional waldos
+	subimages = classifier.classify(subimages);
+	
 
-      TheresWaldo theresWaldo = new TheresWaldo(image);
-      
-      //BufferedImage redWhite = Util.getRedWhiteImg(image);
-      //Subimage.writeImage("REDWHITE", redWhite);
-      
-      int[] window = ed.getSpliceSize(image);
+	//Scale and preproccess subimages for the neural net
+	Util.scaleImages(subimages);
+	Util.consolidateCircles(subimages);
+	
+	
+	MultilayerPerceptron mlp = (MultilayerPerceptron) weka.core.SerializationHelper.read("WaldoFinderNoise.model");	    
+	ArffGenerator ag = new ArffGenerator();
+	
+	//Number of potential waldos to be found
+	int maxSize = 50;
+	Comparator<Subimage> comp = new SubimageComparator();
+	PriorityQueue<Subimage> pq = new PriorityQueue<Subimage>(maxSize, comp);
+	
 
-      Vector<Subimage> subimages = theresWaldo.createSubimages(25, 25, histImage, wIm);      
+	//Iterate over the subimages, grab the top (maxSize) images ranked by the classifier
+	//and the neural net
+	for(i = 0; i < subimages.size(); i++){
+	    Subimage subimage = subimages.get(i);
+		Instance inst = ag.createInstance(subimage.getImage());
+		double[] result = mlp.distributionForInstance(inst);
+		subimage.setNeuralConfidence(result[0]);
+		
+		
+		if(pq.size() < maxSize){
+		    pq.add(subimage);
+		}else{
+		    Subimage top = pq.remove();
+		    if(top.getNeuralConfidence() > subimage.getNeuralConfidence()){
+			pq.add(top);
+		    }else{
+			pq.add(subimage);
+		    }
+		    
+		}
+	}
+	
 
-     Vector<Subimage> sd0To1 = classifier.classifyByStandardDev(subimages, 0.0f, 1.0f);
-      Vector<Subimage> sd1To2 = classifier.classifyByStandardDev(subimages, 1.0f, 2.0f);
-      Vector<Subimage> sd2To3 = classifier.classifyByStandardDev(subimages, 2.0f, 3.0f);
+	//Draw circles around the top potential waldos and print out the resulting image
+	while(pq.size() > 0){
+	    Subimage img = pq.remove();
+	    //img.writeImage("PotentialWaldos/potWaldo" +pq.size() + "__" + img.getCombConfLevel() + ".jpg");
+	    
+	    Util.addCircle(img.getX() + 13, img.getY() +13, img.getRadius(), image, "" + pq.size());
+	}
+	
+	Util.writeImage(image, "circleTest.jpg");
+	
+	
+	
+	
+	
+	
 
-      theresWaldo.writeSubimages(sd0To1, "SD0To1/Subimage");
-      theresWaldo.writeSubimages(sd1To2, "SD1To2/Subimage");
-      theresWaldo.writeSubimages(sd2To3, "SD2To3/Subimage");
-      //n.removeBackground(image);
-
-      //Util.scaleImages(subimages);
-
-      //theresWaldo.writeSubimages(subimages, "AllImages/Subimage");
-
-
-      subimages = classifier.classify(subimages);
-      
-      try {
-	  MultilayerPerceptron mlp = (MultilayerPerceptron) weka.core.SerializationHelper.read("WaldoFinder.model");
-	  
-	  ArffGenerator ag = new ArffGenerator();
-	  Subimage waldo = new Subimage(image, 0, 0);
-	  double highestWaldo = 0;
-
-	  int maxSize = 50;
-	  Comparator<Subimage> comp = new SubimageComparator();
-	  PriorityQueue<Subimage> pq = new PriorityQueue<Subimage>(maxSize, comp);
-	  
-	  boolean added = false;
-	  for(i = 0; i < subimages.size();){
-	      added = false;
-	      for(int j = 0; j < subimages.size(); j++){
-		  Subimage img1 = subimages.get(i);
-		  Subimage img2 = subimages.get(j);
-		  if(i != j && Util.dist(img1,img2) < img1.getRadius()){
-		      
-		      img2.addSubimage(img1);
-		      subimages.remove(i);
-		      added = true;
-		      break;
-		  }
-
-	      }
-
-	      if(!added){
-		  i++;
-	      }
-
-	  }
-	  
-
-	  for(i = 0; i < subimages.size(); i++){
-	      Subimage subimage = subimages.get(i);
-	      Instance inst = ag.createInstance(subimage.getImage());
-	      double[] result = mlp.distributionForInstance(inst);
-	      subimage.setNeuralConfidence(result[0]);
-	      
-
-	      if(pq.size() < maxSize){
-		  pq.add(subimage);
-	      }else{
-		  Subimage top = pq.remove();
-		  if(top.getNeuralConfidence() > subimage.getNeuralConfidence()){
-		      pq.add(top);
-		  }else{
-		      pq.add(subimage);
-		  }
-		  
-	      }
-	  }
-	  
-	  while(pq.size() > 0){
-	      Subimage img = pq.remove();
-	      img.writeImage("PotentialWaldos/potWaldo" +pq.size() + "__" + img.getCombConfLevel() + ".jpg");
-
-	      Util.addCircle(img.getX(), img.getY(), img.getRadius(), image);
-	  }
-	  
-	  Util.writeImage(image, "circleTest.jpg");
-	  
-	  
-
-      } catch(Exception ex) {
-	  ex.printStackTrace();
-      }
-
-      
-     
+	
+	//Debug code
+	
+	//Vector<Subimage> sd0To1 = classifier.classifyByStandardDev(subimages, 0.0f, 1.0f);
+	// Vector<Subimage> sd1To2 = classifier.classifyByStandardDev(subimages, 1.0f, 2.0f);
+	// Vector<Subimage> sd2To3 = classifier.classifyByStandardDev(subimages, 2.0f, 3.0f);
+	
+	// theresWaldo.writeSubimages(sd0To1, "SD0To1/Subimage");
+	// theresWaldo.writeSubimages(sd1To2, "SD1To2/Subimage");
+	// theresWaldo.writeSubimages(sd2To3, "SD2To3/Subimage");
+	
     } catch (Exception e){
 	System.out.println(e);
 	e.printStackTrace();

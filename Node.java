@@ -6,6 +6,10 @@ import javax.imageio.ImageIO;
 import java.util.Vector;
 import java.awt.Color;
 
+/* A sorted linked list used only for subimages. This node class allows for easy 
+ * insertion of subimages based on their confidence level. Furthermore, there is a dummy
+ * node at the very beginning, in order to allow for easier insertion.
+ */
 public class Node{
     private Node next;
     private Subimage image;
@@ -26,6 +30,9 @@ public class Node{
 	this.size = 0;
     }
 
+    // Inserts an image based on its confidence level into the linked list. The first 
+    // node is a dummy node, and therefore can be skipped when checking to see where an
+    // element is to be inserted.
     public void insert(Subimage image, float confLevel){
 	if(next == null) {
 	    next = new Node(image, confLevel);
@@ -45,6 +52,7 @@ public class Node{
 	size++;
     }
 
+    /********Acessor methods for private state.****************/
     public int getSize(){
 	return size;
     }
